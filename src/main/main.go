@@ -27,7 +27,7 @@ func main(){
 		url := ctx.FormValue("url")
 		ctx.Redirect("/")
 		go func(url []byte){
-			command := exec.Command("wrk", "-t4", "-c5", "-d1", string(url), ">>", "out.txt")
+			command := exec.Command("wrk", "-t4", "-c5", "-d2", string(url), ">>", "out.txt")
 			fmt.Println(command.Args)
 			out, err := command.Output()
 			if err != nil {
@@ -37,12 +37,8 @@ func main(){
 			}
 
 			wrkResult := model.WrkResult{}
+			wrkResult.SetData(string(url), out)
 
-			wrkResult.Url = string(url)
-			wrkResult.SetDuration(out)
-			wrkResult.SetThread(out)
-			wrkResult.SetConnection(out)
-			fmt.Println("wrkResult.SetConnection", wrkResult.Connection)
 		}(url)
 	})
 
