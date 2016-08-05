@@ -4,6 +4,7 @@ import (
 	"strings"
 	"strconv"
 	"math"
+	"errors"
 )
 
 const (
@@ -22,7 +23,7 @@ var units = map[string]float64{
 	"h":h,
 }
 
-func StringToInt(s string) (float64, error){
+func StringToFloat(s string) (float64, error){
 	var result float64 = 0
 	for _, unit := range listUnits{
 		if strings.Contains(s, unit){
@@ -37,5 +38,5 @@ func StringToInt(s string) (float64, error){
 			return result, nil
 		}
 	}
-	return result, nil
+	return result, errors.New("Invalid input")
 }
