@@ -1,4 +1,4 @@
-package time
+package mtime
 
 import (
 	"strings"
@@ -34,7 +34,9 @@ func StringToFloat(s string) (float64, error){
 			}
 
 			result = result * units[unit]
-			result = math.Floor(result)
+			if result > 1.0 {
+				result = math.Floor(result)
+			}
 			return result, nil
 		}
 	}

@@ -4,8 +4,12 @@ import (
 	"github.com/kataras/iris"
 	"os/exec"
 	"fmt"
-	"io/ioutil"
+	"bufio"
+	"strings"
 	"model"
+	"gopkg.in/mgo.v2"
+	"time"
+	"strconv"
 )
 
 func main(){
@@ -23,24 +27,66 @@ func main(){
 		ctx.Render("index.html", nil)
 	})
 
+	funcChannel := make(chan func(string, string, string), 100)
+	mongochan := make(chan model.WrkResult, 100)
+
 	iris.Post("/wrk", func(ctx *iris.Context){
-		url := ctx.FormValue("url")
+		url := string(ctx.FormValue("url"))
 		ctx.Redirect("/")
-		go func(url []byte){
-			command := exec.Command("wrk", "-t4", "-c5", "-d2", string(url), ">>", "out.txt")
-			fmt.Println(command.Args)
-			out, err := command.Output()
-			if err != nil {
-				ioutil.WriteFile("out.txt", []byte(err.Error()), 0644)
-			}else{
-				ioutil.WriteFile("out.txt", out, 0644)
+
+		funcChannel <- func(c, d, time string){
+			var t int = 1
+			cc, _ := strconv.Atoi(c)
+			if cc >= 4 {
+				t = 4
 			}
 
+			command := exec.Command("wrk", "-t"+strconv.Itoa(t), "-c"+c, "-d"+d, url)
+			fmt.Println(command.Args)
+			cmdReader, _ := command.StdoutPipe()
+			scanner := bufio.NewScanner(cmdReader)
+			var out string
+			go func() {
+				for scanner.Scan() {
+					out = fmt.Sprintf("%s\n%s", out, scanner.Text())
+					if strings.Contains(out, "Transfer"){
+						break;
+					}
+				}
+			}()
+			command.Start()
+			command.Wait()
 			wrkResult := model.WrkResult{}
-			wrkResult.SetData(string(url), out)
+			wrkResult.SetData(url, out, time)
 
-		}(url)
+			mongochan <- wrkResult
+		}
 	})
+
+	go func(){
+		session, err := mgo.Dial("127.0.0.1")
+		if err != nil {
+			panic(err)
+		}
+		defer session.Close()
+		session.SetMode(mgo.Monotonic, true)
+		c := session.DB("performark").C("mark")
+		for;;{
+			select {
+			case f := <- funcChannel:
+				go func() {
+					t := time.Now().Format("20060102150405")
+					f("1", "10s", t)
+					//f("10", "10s", t)
+					//f("100", "10s", t)
+					//f("1k", "10s", t)
+					//f("10k", "10s", t)
+				}()
+			case wrkResult := <- mongochan:
+				go wrkResult.Save(c)
+			}
+		}
+	}()
 
 	iris.Listen(":8080")
 }

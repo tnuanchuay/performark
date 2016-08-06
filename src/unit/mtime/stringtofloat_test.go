@@ -1,4 +1,4 @@
-package time
+package mtime
 
 import "testing"
 
@@ -32,6 +32,15 @@ func TestItSholdReturn3600WhenEnter1h(t *testing.T){
 func TestItSholdReturn61WhenEnter1dot02(t *testing.T){
 	input := "1.02m"
 	expect := 61.0
+	result, _ := StringToFloat(input)
+	if result != expect{
+		t.Error("expect",expect,"but return", result)
+	}
+}
+
+func TestItSholdReturn61WhenEnter463dot50us(t *testing.T){
+	input := "463.50us"
+	expect := 0.0004635
 	result, _ := StringToFloat(input)
 	if result != expect{
 		t.Error("expect",expect,"but return", result)
