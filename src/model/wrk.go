@@ -180,6 +180,7 @@ func (t *WrkResult) SetConnection(s string){
 	}
 }
 
-func (t *WrkResult) Save(c *mgo.Collection){
+func (t *WrkResult) Save(session *mgo.Session){
+	c := session.DB("performark").C("mark")
 	c.Insert(t)
 }

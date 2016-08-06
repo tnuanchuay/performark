@@ -2,17 +2,22 @@ package main
 
 import (
 	"github.com/kataras/iris"
-	"os/exec"
-	"fmt"
-	"bufio"
-	"strings"
 	"model"
 	"gopkg.in/mgo.v2"
 	"time"
-	"strconv"
+	"fmt"
+	"github.com/googollee/go-socket.io"
+	"log"
 )
 
 func main(){
+
+	session, err := mgo.Dial("127.0.0.1")
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
 
 	iris.Config.IsDevelopment = true
 
@@ -27,63 +32,65 @@ func main(){
 		ctx.Render("index.html", nil)
 	})
 
-	funcChannel := make(chan func(string, string, string), 100)
+	iris.Get("/api/job", func(ctx *iris.Context){
+		j := model.Job{}.GetAllJob(session)
+		ctx.JSON(iris.StatusOK, j)
+	})
+
+	modelChan := make(chan *model.Job, 100)
 	mongochan := make(chan model.WrkResult, 100)
 
 	iris.Post("/wrk", func(ctx *iris.Context){
 		url := string(ctx.FormValue("url"))
 		ctx.Redirect("/")
-
-		funcChannel <- func(c, d, time string){
-			var t int = 1
-			cc, _ := strconv.Atoi(c)
-			if cc >= 4 {
-				t = 4
-			}
-
-			command := exec.Command("wrk", "-t"+strconv.Itoa(t), "-c"+c, "-d"+d, url)
-			fmt.Println(command.Args)
-			cmdReader, _ := command.StdoutPipe()
-			scanner := bufio.NewScanner(cmdReader)
-			var out string
-			go func() {
-				for scanner.Scan() {
-					out = fmt.Sprintf("%s\n%s", out, scanner.Text())
-					if strings.Contains(out, "Transfer"){
-						break;
-					}
-				}
-			}()
-			command.Start()
-			command.Wait()
-			wrkResult := model.WrkResult{}
-			wrkResult.SetData(url, out, time)
-
-			mongochan <- wrkResult
-		}
+		j := model.Job{}.NewInstance(url, session)
+		modelChan <- j
 	})
 
+	server, err := socketio.NewServer(nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	server.On("connection", func (so socketio.Socket){
+		so.Join("real-time")
+		fmt.Println("connection in")
+	})
+
+	server.On("error", func(so socketio.Socket, err error) {
+		log.Println("error:", err)
+	})
+
+	iris.Handle(iris.MethodGet, "/socket.io/", iris.ToHandler(server))
+	iris.Handle(iris.MethodPost, "/socket.io/", iris.ToHandler(server))
+
 	go func(){
-		session, err := mgo.Dial("127.0.0.1")
-		if err != nil {
-			panic(err)
-		}
-		defer session.Close()
-		session.SetMode(mgo.Monotonic, true)
-		c := session.DB("performark").C("mark")
 		for;;{
 			select {
-			case f := <- funcChannel:
+			case j := <- modelChan:
 				go func() {
-					t := time.Now().Format("20060102150405")
-					f("1", "10s", t)
-					//f("10", "10s", t)
-					//f("100", "10s", t)
-					//f("1k", "10s", t)
-					//f("10k", "10s", t)
+					t := j.Unique
+					time.Sleep(2 * time.Second)
+					j.RunWrk("1", "10s", t, mongochan)
+					server.BroadcastTo("real-time", t, `{"IsComplete":false, "Progress":20}`)
+					time.Sleep(2 * time.Second)
+					j.RunWrk("10", "10s", t, mongochan)
+					server.BroadcastTo("real-time", t, `{"IsComplete":false, "Progress":40}`)
+					time.Sleep(2 * time.Second)
+					//j.Function("100", "10s", t)
+					server.BroadcastTo("real-time", t, `{"IsComplete":false, "Progress":60}`)
+					time.Sleep(2 * time.Second)
+					//j.Function("1k", "10s", t)
+					server.BroadcastTo("real-time", t, `{"IsComplete":false, "Progress":80}`)
+					time.Sleep(2 * time.Second)
+					//j.Function("10k", "10s", t)
+					server.BroadcastTo("real-time", t, `{"IsComplete":false, "Progress":100}`)
+
+					j.Complete(session)
+					server.BroadcastTo("real-time", t, `{"IsComplete":true}`)
 				}()
 			case wrkResult := <- mongochan:
-				go wrkResult.Save(c)
+				go wrkResult.Save(session)
 			}
 		}
 	}()

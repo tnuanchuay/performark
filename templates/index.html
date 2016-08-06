@@ -81,10 +81,20 @@
     </div>
 </section>
 
-<section id="result" class="section-style" data-background-image="image/about-us.jpg">
+<section id="result" class="section-style" data-background-image="images/background/about-us.jpg">
     <div class="pattern height-resize">
         <div class="container">
-
+            <table class="table">
+                <thead>
+                <tr>
+                    <td>unique</td>
+                    <td>path</td>
+                    <td>status</td>
+                </tr>
+                </thead>
+                <tbody id="job">
+                </tbody>
+            </table>
         </div>
     </div>
 </section>
@@ -99,6 +109,7 @@
 
 <!-- jQuery Library -->
 <script type="text/javascript" src="assets/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript" src="assets/js/socket.io-1.4.5.js"></script>
 <!-- Modernizr js -->
 <script type="text/javascript" src="assets/js/modernizr-2.8.0.min.js"></script>
 <!-- Plugins -->
@@ -107,6 +118,59 @@
 <script type="text/javascript" src="assets/js/functions.js"></script>
 <!-- Custom JavaScript Functions -->
 <script type="text/javascript" src="assets/js/jquery.ajaxchimp.min.js"></script>
+<script>
+    var socket = io();
+    $(document).ready(function(){
+        $.ajax({
+            url:"/api/job",
+            success : function(data){
+                if(data.length > 0){
+                    for(var i = 0 ; i < data.length ; i++){
+                        var d = data[i];
+                        if(d.IsComplete){
+                            $("#job").append(`
+                            <tr>
+                                <td>${d.Unique}</td>
+                                <td>${d.Url}</td>
+                                <td><span class="label label-success">finished</span></td>
+                            </tr>
+                            `);
+                        }else{
+                            $("#job").append(`
+                            <tr id="${d.Unique}">
+                                <td>${d.Unique}</td>
+                                <td>${d.Url}</td>
+                                <td><span class="label label-primary">starting</span></td>
+                            </tr>
+                            `);
+
+                            socket.on(d.Unique, function(data){
+                                $("#"+d.Unique).html("");
+                                data = JSON.parse(data);
+                                console.log(data);
+                                if(data.IsComplete){
+                                    $("#"+d.Unique).append(`
+                                        <td>${d.Unique}</td>
+                                        <td>${d.Url}</td>
+                                        <td><span class="label label-success">finished</span></td>
+                                    `);
+                                }else{
+                                    $("#"+d.Unique).append(`
+                                        <td>${d.Unique}</td>
+                                        <td>${d.Url}</td>
+                                        <td><span class="label label-primary">running ${data.Progress}%</span></td>
+                                    `);
+                                }
+                            })
+                        }
+                    }
+                }else{
+                    $("#job").append("<td></td><td></td><td></td>")
+                }
+            }
+        })
+    })
+</script>
 
 </body>
 </html>
