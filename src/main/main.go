@@ -1,14 +1,18 @@
 package main
 
 import (
-	"github.com/kataras/iris"
-	"model"
 	"gopkg.in/mgo.v2"
-	"time"
-	"fmt"
-	"github.com/googollee/go-socket.io"
+	"github.com/kataras/iris"
 	"log"
+	"time"
+	"model"
+	"strings"
+	"github.com/googollee/go-socket.io"
+	"fmt"
+	"encoding/json"
+	"io/ioutil"
 )
+
 
 func main(){
 
@@ -18,6 +22,9 @@ func main(){
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
+
+	dat, _ := ioutil.ReadFile("templates/script.js")
+	CHART_SCRIPT := string(dat)
 
 	iris.Config.IsDevelopment = true
 
@@ -30,6 +37,83 @@ func main(){
 
 	iris.Get("/", func(ctx *iris.Context){
 		ctx.Render("index.html", nil)
+	})
+
+	iris.Get("/job/:unique", func(ctx *iris.Context){
+		unique := ctx.Param("unique")
+		ctx.Render("job.html", map[string]interface{}{
+			"Unique":unique,
+		})
+	})
+
+	iris.Get("/script/wrk-stats/:unique", func(ctx *iris.Context) {
+		unique := ctx.Param("unique")
+		chart := model.Chart{}.NewInstance(unique)
+
+		chart.RetrieveRequestPerSec(session).
+			RetrieveTransferPerSec(session).
+			RetrieveLatency(session).
+			RetrieveThread(session).
+			RetrieveRequest(session)
+
+		jsonrps, err := json.Marshal(chart.RequestPerSec)
+		if err != nil{
+			ctx.JSON(iris.StatusOK, err)
+		}
+
+		jsontps, err := json.Marshal(chart.TransferPerSec)
+		if err != nil{
+			ctx.JSON(iris.StatusOK, err)
+		}
+
+		jsonlm, err := json.Marshal(chart.LatencyMax)
+		if err != nil{
+			ctx.JSON(iris.StatusOK, err)
+		}
+
+		jsonla, err := json.Marshal(chart.LatencyAvg)
+		if err != nil{
+			ctx.JSON(iris.StatusOK, err)
+		}
+
+		jsonls, err := json.Marshal(chart.LatencyStd)
+		if err != nil{
+			ctx.JSON(iris.StatusOK, err)
+		}
+
+		jsontm, err := json.Marshal(chart.ThreadMax)
+		if err != nil{
+			ctx.JSON(iris.StatusOK, err)
+		}
+
+		jsonta, err := json.Marshal(chart.ThreadAvg)
+		if err != nil{
+			ctx.JSON(iris.StatusOK, err)
+		}
+
+		jsonts, err := json.Marshal(chart.ThreadStd)
+		if err != nil{
+			ctx.JSON(iris.StatusOK, err)
+		}
+
+		jsonr, err := json.Marshal(chart.Requests)
+		if err != nil{
+			ctx.JSON(iris.StatusOK, err)
+		}
+
+		s := CHART_SCRIPT
+		s = strings.Replace(s, "{{.Unique}}", unique, -1)
+		s = strings.Replace(s, "{{.rps}}", string(jsonrps), -1)
+		s = strings.Replace(s, "{{.tps}}", string(jsontps), -1)
+		s = strings.Replace(s, "{{.lm}}", string(jsonlm), -1)
+		s = strings.Replace(s, "{{.la}}", string(jsonla), -1)
+		s = strings.Replace(s, "{{.ls}}", string(jsonls), -1)
+		s = strings.Replace(s, "{{.tm}}", string(jsontm), -1)
+		s = strings.Replace(s, "{{.ta}}", string(jsonta), -1)
+		s = strings.Replace(s, "{{.ts}}", string(jsonts), -1)
+		s = strings.Replace(s, "{{.r}}", string(jsonr), -1)
+
+		ctx.Text(iris.StatusOK, s)
 	})
 
 	iris.Get("/api/job", func(ctx *iris.Context){
@@ -72,20 +156,21 @@ func main(){
 					t := j.Unique
 					time.Sleep(2 * time.Second)
 					j.RunWrk("1", "10s", t, mongochan)
-					server.BroadcastTo("real-time", t, `{"Unique":"` + t + `", "IsComplete":false, "Progress":17}`)
+					server.BroadcastTo("real-time", t, `{"Unique":"` + t + `", "IsComplete":false, "Progress":15}`)
 					time.Sleep(2 * time.Second)
 					j.RunWrk("10", "10s", t, mongochan)
-					server.BroadcastTo("real-time", t, `{"Unique":"` + t + `", "IsComplete":false, "Progress":34}`)
+					server.BroadcastTo("real-time", t, `{"Unique":"` + t + `", "IsComplete":false, "Progress":30}`)
 					time.Sleep(2 * time.Second)
-					//j.Function("100", "10s", t)
-					server.BroadcastTo("real-time", t, `{"Unique":"` + t + `", "IsComplete":false, "Progress":51}`)
+					j.RunWrk("100", "10s", t, mongochan)
+					server.BroadcastTo("real-time", t, `{"Unique":"` + t + `", "IsComplete":false, "Progress":45}`)
 					time.Sleep(2 * time.Second)
-					//j.Function("1k", "10s", t)
-					server.BroadcastTo("real-time", t, `{"Unique":"` + t + `", "IsComplete":false, "Progress":68}`)
+					j.RunWrk("1k", "10s", t, mongochan)
+					server.BroadcastTo("real-time", t, `{"Unique":"` + t + `", "IsComplete":false, "Progress":60}`)
 					time.Sleep(2 * time.Second)
-					//j.Function("10k", "10s", t)
-					server.BroadcastTo("real-time", t, `{"Unique":"` + t + `", "IsComplete":false, "Progress":83}`)
-
+					j.RunWrk("10k", "10s", t, mongochan)
+					server.BroadcastTo("real-time", t, `{"Unique":"` + t + `", "IsComplete":false, "Progress":75}`)
+					j.RunWrk("100k", "10s", t, mongochan)
+					server.BroadcastTo("real-time", t, `{"Unique":"` + t + `", "IsComplete":false, "Progress":90}`)
 					j.Complete(session)
 					server.BroadcastTo("real-time", t, `{"Unique":"` + t + `", "IsComplete":true, "Progress":100}`)
 				}()

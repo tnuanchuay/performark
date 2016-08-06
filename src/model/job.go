@@ -48,6 +48,7 @@ func (j *Job) RunWrk(c, d, time string, mongoChan chan WrkResult){
 	}()
 	command.Start()
 	command.Wait()
+	fmt.Println(out)
 	wrkResult := WrkResult{}
 	wrkResult.SetData(url, out, time)
 

@@ -3,7 +3,6 @@ package mtime
 import (
 	"strings"
 	"strconv"
-	"math"
 	"errors"
 )
 
@@ -32,11 +31,7 @@ func StringToFloat(s string) (float64, error){
 			if err != nil {
 				return result, error(err)
 			}
-
 			result = result * units[unit]
-			if result > 1.0 {
-				result = math.Floor(result)
-			}
 			return result, nil
 		}
 	}

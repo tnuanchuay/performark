@@ -81,9 +81,9 @@
     </div>
     <div id="result" class="pattern height-resize">
         <div class="container">
-            <table class="table">
+            <table class="table table-hover">
                 <thead>
-                <tr>
+                <tr class="job-row">
                     <td>unique</td>
                     <td>path</td>
                     <td>status</td>
@@ -126,11 +126,11 @@
                         var d = data[i];
                         if(d.IsComplete){
                             $("#job").append(`
-                            <tr id="tr_${d.Unique}">
-                                <td>${d.Unique}</td>
-                                <td>${d.Url}</td>
-                                <td><span class="label label-success">finished</span></td>
-                            </tr>
+                                <tr id="tr_${d.Unique}" onclick="document.location='/job/${d.Unique}'">
+                                    <td>${d.Unique}</td>
+                                    <td>${d.Url}</td>
+                                    <td><span class="label label-success">finished</span></td>
+                                </tr>
                             `);
                         }else{
                             $("#job").append(`
@@ -145,16 +145,20 @@
                                 console.log(data);
                                 data = JSON.parse(data);
                                 if(data.IsComplete){
-                                    console.log($(`#tr_${data.Unique}`)
+                                    $(`#tr_${data.Unique}`)
                                         .find(`td`)
                                         .eq(2)
-                                        .html(`<span class="label label-success">finished</span>`));
-                                    socket.on(d.Unique, null);
+                                        .html(`<span class="label label-success">finished</span>`);
+                                    $(`#tr_${data.Unique}`).addClass("job-row")
+                                    $(`#tr_${data.Unique}`).attr({
+                                        "onclick":`document.location='/job/${d.Unique}'`
+                                    })
+                                    socket.on(data.Unique, null);
                                 }else{
-                                    console.log($(`#tr_${data.Unique}`)
+                                    $(`#tr_${data.Unique}`)
                                         .find(`td`)
                                         .eq(2)
-                                        .html(`<span class="label label-primary">running ${data.Progress}%</span>`));
+                                        .html(`<span class="label label-primary">running ${data.Progress}%</span>`);
                                 }
                             })
                         }

@@ -2,7 +2,9 @@
 /* Background Images
 -------------------------------------------------------------------*/
 var  sectionImage = jQuery('#section').data('background-image');
+var  resultImage = jQuery('#result').data('background-image');
 if (sectionImage) {  jQuery('#section').css({ 'background-image':'url(' + sectionImage + ')' }); };
+if (resultImage) {  jQuery('#result').css({ 'background-image':'url(' + resultImage + ')' }); };
 
 /* Background Images End
 -------------------------------------------------------------------*/
