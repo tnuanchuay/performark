@@ -1,10 +1,8 @@
 
 /* Background Images
 -------------------------------------------------------------------*/
-var  newImage = jQuery('#new').data('background-image');
-var  resultImage = jQuery('#result').data('background-image');
-if (newImage) {  jQuery('#new').css({ 'background-image':'url(' + newImage + ')' });};
-if (resultImage) {  jQuery('#result').css({ 'background-image':'url(' + resultImage + ')' }); };
+var  sectionImage = jQuery('#section').data('background-image');
+if (sectionImage) {  jQuery('#section').css({ 'background-image':'url(' + sectionImage + ')' }); };
 
 /* Background Images End
 -------------------------------------------------------------------*/
@@ -16,6 +14,8 @@ if (resultImage) {  jQuery('#result').css({ 'background-image':'url(' + resultIm
 jQuery(document).ready(function($) {
 
 	"use strict";
+
+
     /* Window Height Resize
     -------------------------------------------------------------------*/
     var windowheight = jQuery(window).height();
@@ -27,8 +27,8 @@ jQuery(document).ready(function($) {
     -------------------------------------------------------------------*/
 
 
-    
-	/* Main Menu   
+
+	/* Main Menu
 	-------------------------------------------------------------------*/
 	$('#main-menu #headernavigation').onePageNav({
 		currentClass: 'active',
@@ -38,16 +38,13 @@ jQuery(document).ready(function($) {
 		scrollOffset: 0,
 		filter: '',
 		easing: 'swing'
-	});  
+	});
 
-	/* Main Menu End  
+	/* Main Menu End
 	-------------------------------------------------------------------*/
 
-	/* Next Section   
-	-------------------------------------------------------------------*/
-//	$('.next-section .go-to-about').click(function() {
-//    	$('html,body').animate({scrollTop:$('#about').offset().top}, 1000);
-//  	});
+
+
 
 });
 
@@ -55,13 +52,12 @@ jQuery(document).ready(function($) {
 -------------------------------------------------------------------*/
 
 
-/* Preloder 
+/* Preloder
 -------------------------------------------------------------------*/
-$(window).load(function () {    
+$(window).load(function () {
     "use strict";
     $("#loader").fadeOut();
     $("#preloader").delay(350).fadeOut("slow");
 });
  /* Preloder End
 -------------------------------------------------------------------*/
-   
