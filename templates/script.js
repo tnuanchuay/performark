@@ -312,7 +312,7 @@ options: {
 responsive: true,
 	    title:{
 display: true,
-	 text:"Error",
+	 text:"Request And Error",
 	 position:"top",
 	 fontColor: '#fff',
 	 fontSize:16,
