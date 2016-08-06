@@ -41,8 +41,10 @@ func main(){
 
 	iris.Get("/job/:unique", func(ctx *iris.Context){
 		unique := ctx.Param("unique")
+		j := model.Job{}.Find(session, unique)
 		ctx.Render("job.html", map[string]interface{}{
 			"Unique":unique,
+			"Url":j.Url,
 		})
 	})
 
@@ -54,7 +56,9 @@ func main(){
 			RetrieveTransferPerSec(session).
 			RetrieveLatency(session).
 			RetrieveThread(session).
-			RetrieveRequest(session)
+			RetrieveRequest(session).
+			RetrieveTransfer(session).
+			RetrieveSocketError(session)
 
 		jsonrps, err := json.Marshal(chart.RequestPerSec)
 		if err != nil{
@@ -101,6 +105,41 @@ func main(){
 			ctx.JSON(iris.StatusOK, err)
 		}
 
+		jsontt, err := json.Marshal(chart.TotalTransfer)
+		if err != nil{
+			ctx.JSON(iris.StatusOK, err)
+		}
+
+		jsonec, err := json.Marshal(chart.SocketErrorsConnect)
+		if err != nil{
+			ctx.JSON(iris.StatusOK, err)
+		}
+
+		jsoner, err := json.Marshal(chart.SocketErrorsRead)
+		if err != nil{
+			ctx.JSON(iris.StatusOK, err)
+		}
+
+		jsonew, err := json.Marshal(chart.SocketErrorsWrite)
+		if err != nil{
+			ctx.JSON(iris.StatusOK, err)
+		}
+
+		jsonet, err := json.Marshal(chart.SocketErrorsTimeOut)
+		if err != nil{
+			ctx.JSON(iris.StatusOK, err)
+		}
+
+		jsonex, err := json.Marshal(chart.SocketErrorsNon2xx3xx)
+		if err != nil{
+			ctx.JSON(iris.StatusOK, err)
+		}
+
+		jsone, err := json.Marshal(chart.SocketErrorsTotal)
+		if err != nil{
+			ctx.JSON(iris.StatusOK, err)
+		}
+
 		s := CHART_SCRIPT
 		s = strings.Replace(s, "{{.Unique}}", unique, -1)
 		s = strings.Replace(s, "{{.rps}}", string(jsonrps), -1)
@@ -112,6 +151,13 @@ func main(){
 		s = strings.Replace(s, "{{.ta}}", string(jsonta), -1)
 		s = strings.Replace(s, "{{.ts}}", string(jsonts), -1)
 		s = strings.Replace(s, "{{.r}}", string(jsonr), -1)
+		s = strings.Replace(s, "{{.tt}}", string(jsontt), -1)
+		s = strings.Replace(s, "{{.ec}}", string(jsonec), -1)
+		s = strings.Replace(s, "{{.er}}", string(jsoner), -1)
+		s = strings.Replace(s, "{{.ew}}", string(jsonew), -1)
+		s = strings.Replace(s, "{{.et}}", string(jsonet), -1)
+		s = strings.Replace(s, "{{.ex}}", string(jsonex), -1)
+		s = strings.Replace(s, "{{.e}}", string(jsone), -1)
 
 		ctx.Text(iris.StatusOK, s)
 	})

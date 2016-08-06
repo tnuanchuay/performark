@@ -46,3 +46,12 @@ func TestItShouldReturn2WhenEnter2(t *testing.T){
 		t.Error("expect", expected, "but return", result)
 	}
 }
+
+func TestItShouldReturn2200000WhenEnter2dot2MB(t *testing.T){
+	input  := "2.2MB"
+	expected := 2200000.0
+	result, _ := SIToFloat(input)
+	if expected != result{
+		t.Error("expect", expected, "but return", result)
+	}
+}

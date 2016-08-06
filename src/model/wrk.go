@@ -23,7 +23,17 @@ type WrkResult struct {
 	Requests	int
 	RequestPerSec	float64
 	TransferPerSec	float64
+	TotalTransfer	float64
+	SocketErrors	SocketErrors
 	RawOutput	string
+}
+
+type SocketErrors struct {
+	Connect		int
+	Read		int
+	Write		int
+	Timeout		int
+	Non2xx3xx	int
 }
 
 type Latency struct {
@@ -50,6 +60,46 @@ func (wrkResult *WrkResult) SetData(url, out, time string){
 	wrkResult.SetRawOutput(out)
 	wrkResult.SetLatency(out)
 	wrkResult.SetReqPerSec(out)
+	wrkResult.SetTotalTransfer(out)
+	wrkResult.SetSocketErrors(out)
+}
+
+func (t *WrkResult) SetSocketErrors(s string){
+	regexpErr1 := regexp.MustCompile("Socket errors: connect [0-9]*, read [0-9]*, write [0-9]*, timeout [0-9]*")
+	result := regexpErr1.FindAllStringSubmatch(s, -1)
+	socketErrors := SocketErrors{}
+	if len(result) == 1{
+		textError1 := result[0][0]
+		textError1 = strings.Replace(textError1, ",", "", -1)
+		splitedTextError1 := strings.Fields(textError1)
+		socketErrors.Connect, _ = strconv.Atoi(splitedTextError1[3])
+		socketErrors.Read, _ = strconv.Atoi(splitedTextError1[5])
+		socketErrors.Write, _ = strconv.Atoi(splitedTextError1[7])
+		socketErrors.Timeout, _ = strconv.Atoi(splitedTextError1[9])
+	}
+
+	regexpErr2 := regexp.MustCompile("Non-2xx or 3xx responses: [0-9]*")
+	result = regexpErr2.FindAllStringSubmatch(s, -1)
+	if len(result) == 1{
+		textError2 := result[0][0]
+		splitedTextError2 := strings.Fields(textError2)[4]
+		socketErrors.Non2xx3xx, _ = strconv.Atoi(splitedTextError2)
+	}
+	t.SocketErrors = socketErrors
+	fmt.Println("t.SocketErrors", t.SocketErrors)
+}
+
+func (t *WrkResult) SetTotalTransfer(s string){
+	regexpTotalTransfer := regexp.MustCompile(", [0-9A-Za-z.]* read")
+	result := regexpTotalTransfer.FindAllStringSubmatch(s, -1)
+	if len(result) != 1{
+		t.SetError("TotalTransfer")
+	}else{
+		textTotalTransfer := result[0][0]
+		splitedTextTotalTransfer := strings.Fields(textTotalTransfer)
+		t.TotalTransfer,_ = si.SIToFloat(splitedTextTotalTransfer[1])
+		fmt.Println("t.TotalTransfer", t.TotalTransfer)
+	}
 }
 
 func (t *WrkResult) SetReqPerSec(s string){

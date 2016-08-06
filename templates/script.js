@@ -3,6 +3,9 @@ var tps = $("#tps");
 var latency = $("#latency");
 var thread = $("#thread");
 var requests = $("#requests");
+var transfer = $("#transfer");
+var error = $("#error");
+var rpe = $("#rpe");
 
 var global = Chart.defaults.global;
 global.defaultFontColor = '#FFF';
@@ -202,3 +205,121 @@ legend: optLegend,
 	 }
 });
 
+var transfers = new Chart(transfer, {
+type: 'line',
+data: {
+labels: xLabel,
+datasets: [{
+label: 'Transfer',
+data: {{.tt}},
+backgroundColor: 'rgba(255, 159, 64, 0.2)',
+borderColor: 'rgba(255, 159, 64, 1)',
+borderWidth: 4
+}]
+},
+options: {
+responsive: true,
+	    title:{
+display: true,
+	 text:"Transfer",
+	 position:"top",
+	 fontColor: '#fff',
+	 fontSize:16,
+	    },
+legend: optLegend,
+	scales: optScales,
+	hover: optHover,
+	tooltips: optTooltips
+	 }
+});
+
+var errors = new Chart(error, {
+type: 'line',
+data: {
+labels: xLabel,
+datasets: [{
+label: 'Socket Error Connect',
+data: {{.ec}},
+backgroundColor: 'rgba(255, 99, 132, 0.2)',
+borderColor: 'rgba(255,99,132,1)',
+borderWidth: 4
+},
+{
+label: 'Socket Error Read',
+data: {{.er}},
+backgroundColor: 'rgba(54, 162, 235, 0.2)',
+borderColor: 'rgba(54, 162, 235, 1)',
+borderWidth: 4
+},
+{
+label: 'Socket Error Write',
+data: {{.ew}},
+backgroundColor: 'rgba(255, 206, 86, 0.2)',
+borderColor: 'rgba(255, 206, 86, 1)',
+borderWidth: 4
+},
+{
+label: 'Socket Error Timeout',
+data: {{.et}},
+backgroundColor: 'rgba(255, 159, 64, 0.2)',
+borderColor: 'rgba(255, 159, 64, 1)',
+borderWidth: 4
+},
+{
+label: 'Socket Error Non 2xx or 3xx',
+data: {{.ex}},
+backgroundColor: 'rgba(75, 192, 192, 0.2)',
+borderColor: 'rgba(75, 192, 192, 1)',
+borderWidth: 4
+}]
+},
+options: {
+responsive: true,
+	    title:{
+display: true,
+	 text:"Error",
+	 position:"top",
+	 fontColor: '#fff',
+	 fontSize:16,
+	    },
+legend: optLegend,
+	scales: optScales,
+	hover: optHover,
+	tooltips: optTooltips
+	 }
+});
+
+var rpec = new Chart(rpe, {
+type: 'line',
+data: {
+labels: xLabel,
+datasets: [{
+label: 'Request',
+data: {{.r}},
+backgroundColor: 'rgba(153, 102, 255, 0.2)',
+borderColor: 'rgba(153, 102, 255, 1)',
+borderWidth: 4
+},
+{
+label: 'Socket Error',
+data: {{.e}},
+backgroundColor: 'rgba(75, 192, 192, 0.2)',
+borderColor: 'rgba(75, 192, 192, 1)',
+borderWidth: 4
+}]
+},
+options: {
+responsive: true,
+	    title:{
+display: true,
+	 text:"Error",
+	 position:"top",
+	 fontColor: '#fff',
+	 fontSize:16,
+	    },
+legend: optLegend,
+	scales: optScales,
+	hover: optHover,
+	tooltips: optTooltips
+	 }
+});

@@ -74,3 +74,10 @@ func (j *Job) Save(session *mgo.Session){
 	c := session.DB("performark").C("job")
 	c.Insert(j)
 }
+
+func (Job) Find(session *mgo.Session, unique string)(*Job){
+	c := session.DB("performark").C("job")
+	j := Job{}
+	c.Find(bson.M{"unique":unique}).One(&j)
+	return &j
+}
