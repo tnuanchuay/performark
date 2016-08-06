@@ -65,7 +65,7 @@ func (Job) NewInstance(url string, session *mgo.Session) *Job{
 func (Job) GetAllJob(session *mgo.Session) []Job{
 	result := []Job{}
 	c := session.DB("performark").C("job")
-	c.Find(bson.M{}).All(&result)
+	c.Find(bson.M{}).Sort("-unique").All(&result)
 	return result
 }
 

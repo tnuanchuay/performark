@@ -129,7 +129,7 @@
                         var d = data[i];
                         if(d.IsComplete){
                             $("#job").append(`
-                            <tr>
+                            <tr id="tr_${d.Unique}">
                                 <td>${d.Unique}</td>
                                 <td>${d.Url}</td>
                                 <td><span class="label label-success">finished</span></td>
@@ -137,29 +137,27 @@
                             `);
                         }else{
                             $("#job").append(`
-                            <tr id="${d.Unique}">
+                            <tr id="tr_${d.Unique}">
                                 <td>${d.Unique}</td>
                                 <td>${d.Url}</td>
-                                <td><span class="label label-primary">starting</span></td>
+                                <td><span class="label label-primary">waiting...</span></td>
                             </tr>
                             `);
 
                             socket.on(d.Unique, function(data){
-                                $("#"+d.Unique).html("");
-                                data = JSON.parse(data);
                                 console.log(data);
+                                data = JSON.parse(data);
                                 if(data.IsComplete){
-                                    $("#"+d.Unique).append(`
-                                        <td>${d.Unique}</td>
-                                        <td>${d.Url}</td>
-                                        <td><span class="label label-success">finished</span></td>
-                                    `);
+                                    console.log($(`#tr_${data.Unique}`)
+                                        .find(`td`)
+                                        .eq(2)
+                                        .html(`<span class="label label-success">finished</span>`));
+                                    socket.on(d.Unique, null);
                                 }else{
-                                    $("#"+d.Unique).append(`
-                                        <td>${d.Unique}</td>
-                                        <td>${d.Url}</td>
-                                        <td><span class="label label-primary">running ${data.Progress}%</span></td>
-                                    `);
+                                    console.log($(`#tr_${data.Unique}`)
+                                        .find(`td`)
+                                        .eq(2)
+                                        .html(`<span class="label label-primary">running ${data.Progress}%</span>`));
                                 }
                             })
                         }
