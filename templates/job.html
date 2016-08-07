@@ -56,6 +56,7 @@
     <nav class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
             <li ><a href="/">Back</a></li>
+            <li ><a href="/delete/{{ .Unique }}">Delete</a></li>
         </ul>
     </nav>
 </div>
@@ -78,8 +79,14 @@
             <div class="col-sm-6"><canvas id="thread"></canvas></div>
             <div class="col-sm-6"><canvas id="requests"></canvas></div>
             <div class="col-sm-6"><canvas id="transfer"></canvas></div>
-            <div class="col-sm-12"><canvas id="error"></canvas></div>
+            <div class="col-sm-6"><canvas id="errorc1"></canvas></div>
+            <div class="col-sm-6"><canvas id="errorc10"></canvas></div>
+            <div class="col-sm-6"><canvas id="errorc100"></canvas></div>
+            <div class="col-sm-6"><canvas id="errorc1k"></canvas></div>
+            <div class="col-sm-6"><canvas id="errorc10k"></canvas></div>
+            <div class="col-sm-6"><canvas id="errorc100k"></canvas></div>
             <div class="col-sm-12"><canvas id="rpe"></canvas></div>
+            <div class="col-sm-12"><canvas id="rpe2"></canvas></div>
         </div>
     </div>
 </section>

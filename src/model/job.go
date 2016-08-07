@@ -73,3 +73,8 @@ func (Job) Find(session *mgo.Session, unique string)(*Job){
 	c.Find(bson.M{"unique":unique}).One(&j)
 	return &j
 }
+
+func (Job) Delete(session *mgo.Session, unique string){
+	c := session.DB("performark").C("job")
+	c.Remove(bson.M{"unique":unique})
+}

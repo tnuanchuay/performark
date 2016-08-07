@@ -13,9 +13,28 @@ import (
 	"io/ioutil"
 )
 
+type(
+	TestSuit struct{
+		Thread		string
+		Connection	string
+		Duration	string
+	}
+)
+
+
+var minimalTestSuite	[]TestSuit
+
+func initMinimalTestSuite(){
+	minimalTestSuite = append(minimalTestSuite, TestSuit{Thread:"1", Connection:"1", Duration:"10s"})
+	minimalTestSuite = append(minimalTestSuite, TestSuit{Thread:"4", Connection:"10", Duration:"10s"})
+	minimalTestSuite = append(minimalTestSuite, TestSuit{Thread:"4", Connection:"100", Duration:"10s"})
+	minimalTestSuite = append(minimalTestSuite, TestSuit{Thread:"4", Connection:"1k", Duration:"10s"})
+	minimalTestSuite = append(minimalTestSuite, TestSuit{Thread:"4", Connection:"10k", Duration:"10s"})
+	minimalTestSuite = append(minimalTestSuite, TestSuit{Thread:"4", Connection:"100k", Duration:"10s"})
+}
 
 func main(){
-
+	initMinimalTestSuite()
 	session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 		panic(err)
@@ -46,6 +65,13 @@ func main(){
 			"Unique":unique,
 			"Url":j.Url,
 		})
+	})
+
+	iris.Get("/delete/:unique", func(ctx *iris.Context){
+		unique := ctx.Param("unique")
+		model.Job{}.Delete(session, unique)
+		model.WrkResult{}.Delete(session, unique)
+		ctx.Redirect("/", iris.StatusOK)
 	})
 
 	iris.Get("/script/wrk-stats/:unique", func(ctx *iris.Context) {
@@ -200,23 +226,14 @@ func main(){
 			case j := <- modelChan:
 				go func() {
 					t := j.Unique
-					time.Sleep(2 * time.Second)
-					j.RunWrk("1", "1", "10s", t, mongochan)
-					server.BroadcastTo("real-time", t, `{"Unique":"` + t + `", "IsComplete":false, "Progress":15}`)
-					time.Sleep(2 * time.Second)
-					j.RunWrk("4", "10", "10s", t, mongochan)
-					server.BroadcastTo("real-time", t, `{"Unique":"` + t + `", "IsComplete":false, "Progress":30}`)
-					time.Sleep(2 * time.Second)
-					j.RunWrk("4", "100", "10s", t, mongochan)
-					server.BroadcastTo("real-time", t, `{"Unique":"` + t + `", "IsComplete":false, "Progress":45}`)
-					time.Sleep(2 * time.Second)
-					j.RunWrk("4", "1k", "10s", t, mongochan)
-					server.BroadcastTo("real-time", t, `{"Unique":"` + t + `", "IsComplete":false, "Progress":60}`)
-					time.Sleep(2 * time.Second)
-					j.RunWrk("4", "10k", "10s", t, mongochan)
-					server.BroadcastTo("real-time", t, `{"Unique":"` + t + `", "IsComplete":false, "Progress":75}`)
-					j.RunWrk("4", "100k", "10s", t, mongochan)
-					server.BroadcastTo("real-time", t, `{"Unique":"` + t + `", "IsComplete":false, "Progress":90}`)
+					for i, testsuite := range minimalTestSuite{
+						time.Sleep(2 * time.Second)
+						j.RunWrk(testsuite.Thread, testsuite.Connection, testsuite.Duration, t, mongochan)
+						server.
+							BroadcastTo("real-time",
+							t,
+							`{"Unique":"` + t + `", "IsComplete":false, "Progress":` + fmt.Sprintf("%.2f", float64((i+1))/float64(len(minimalTestSuite))*100.0) + `}`)
+					}
 					j.Complete(session)
 					server.BroadcastTo("real-time", t, `{"Unique":"` + t + `", "IsComplete":true, "Progress":100}`)
 				}()

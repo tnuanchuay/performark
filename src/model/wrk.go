@@ -8,6 +8,7 @@ import (
 	"unit/si"
 	"strconv"
 	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 type WrkResult struct {
@@ -233,4 +234,9 @@ func (t *WrkResult) SetConnection(s string){
 func (t *WrkResult) Save(session *mgo.Session){
 	c := session.DB("performark").C("mark")
 	c.Insert(t)
+}
+
+func (WrkResult) Delete(session *mgo.Session, unique string){
+	c := session.DB("performark").C("mark")
+	c.Remove(bson.M{"unique":unique})
 }
