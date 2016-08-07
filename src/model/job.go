@@ -4,7 +4,6 @@ import (
 	"gopkg.in/mgo.v2"
 	"time"
 	"gopkg.in/mgo.v2/bson"
-	"strconv"
 	"os/exec"
 	"fmt"
 	"bufio"
@@ -23,17 +22,10 @@ func (j *Job) Complete(session *mgo.Session){
 	c.Upsert(bson.M{"unique":j.Unique}, j)
 }
 
-func (j *Job) RunWrk(c, d, time string, mongoChan chan WrkResult){
-	var t int = 1
-
+func (j *Job) RunWrk(t, c, d, time string, mongoChan chan WrkResult){
 	url := j.Url
 
-	cc, _ := strconv.Atoi(c)
-	if cc >= 4 {
-		t = 4
-	}
-
-	command := exec.Command("wrk", "-t"+strconv.Itoa(t), "-c"+c, "-d"+d, url)
+	command := exec.Command("wrk", "-t"+t, "-c"+c, "-d"+d, url)
 	fmt.Println(command.Args)
 	cmdReader, _ := command.StdoutPipe()
 	scanner := bufio.NewScanner(cmdReader)
