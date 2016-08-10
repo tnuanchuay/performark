@@ -5,7 +5,7 @@ Web Benchmark to test your API performance. Install in your develop machine and 
 * [golang](https://golang.org/)
 * [mongodb](https://www.mongodb.com/)
 
-### Avialable
+### Available
 * Linux
 
 ### Installation
