@@ -64,6 +64,7 @@ func main(){
 		ctx.Render("job.html", map[string]interface{}{
 			"Unique":unique,
 			"Url":j.Url,
+			"Load":j.Load,
 		})
 	})
 
@@ -197,9 +198,16 @@ func main(){
 	mongochan := make(chan model.WrkResult, 100)
 
 	iris.Post("/wrk", func(ctx *iris.Context){
-		url := string(ctx.FormValue("url"))
+		bUrl := ctx.FormValue("url")
+		body := string(ctx.FormValue("body"))
 		ctx.Redirect("/")
-		j := model.Job{}.NewInstance(url, session)
+		if bUrl == nil{
+			return;
+		}
+
+		url := string(bUrl)
+
+		j := model.Job{}.NewInstance(url, session, body)
 		modelChan <- j
 	})
 

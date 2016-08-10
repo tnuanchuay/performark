@@ -8,12 +8,14 @@ import (
 	"fmt"
 	"bufio"
 	"strings"
+	"io/ioutil"
 )
 
 type Job struct{
 	Unique		string
 	IsComplete	bool
 	Url		string
+	Load		string
 }
 
 func (j *Job) Complete(session *mgo.Session){
@@ -24,8 +26,12 @@ func (j *Job) Complete(session *mgo.Session){
 
 func (j *Job) RunWrk(t, c, d, time string, mongoChan chan WrkResult){
 	url := j.Url
-
-	command := exec.Command("wrk", "-t"+t, "-c"+c, "-d"+d, url)
+	var command *exec.Cmd
+	if len(j.Load) > 0{
+		command = exec.Command("wrk", "-t"+t, "-c"+c, "-d"+d, "-s", fmt.Sprintf("lua/%s.lua", j.Unique),url)
+	}else{
+		command = exec.Command("wrk", "-t"+t, "-c"+c, "-d"+d, url)
+	}
 	fmt.Println(command.Args)
 	cmdReader, _ := command.StdoutPipe()
 	scanner := bufio.NewScanner(cmdReader)
@@ -47,11 +53,23 @@ func (j *Job) RunWrk(t, c, d, time string, mongoChan chan WrkResult){
 	mongoChan <- wrkResult
 }
 
-func (Job) NewInstance(url string, session *mgo.Session) *Job{
+func (j *Job) SetLoad(load string) *Job{
+	j.Load = load
+	dat, _ := ioutil.ReadFile("lua/default.lua")
+	luaDefaultScript := string(dat)
+	luaCustomScript := strings.Replace(luaDefaultScript, "{{load}}", fmt.Sprintf(`"%s"`, load), -1)
+	ioutil.WriteFile(fmt.Sprintf("lua/%s.lua", j.Unique), []byte(luaCustomScript), 0644)
+	return j
+}
+
+func (Job) NewInstance(url string, session *mgo.Session, load string) *Job{
 	t := time.Now().Format("20060102150405")
 	j := Job{Unique:t, IsComplete:false}
 	j.Url = url
 	j.Save(session)
+	if len(load) != 0{
+		j.SetLoad(load)
+	}
 	return &j
 }
 

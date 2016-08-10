@@ -71,10 +71,12 @@
         </div>
         <div class="container">
             <form action="/wrk" method="post">
-                <div class="form-group">
-                    <input type="text" class="form-control" name="url" placeholder="url..."
-                           aria-describedby="b-icon">
-                    <button class="btn pull-right" type="submit">Benchmark</button>
+                <div class="col-sm-12 form-group pull-right">
+                    <div class="col-sm-12 row pull-right">
+                        <input type="text" class="form-control pull-right" name="url" placeholder="url...">
+                        <input type="text" class="form-control pull-right" name="body" placeholder="body...">
+                        <button class="btn pull-right" type="submit">Benchmark</button>
+                    </div>
                 </div>
             </form>
         </div>

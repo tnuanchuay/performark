@@ -538,13 +538,33 @@ legend: optLegend,
 });
 
 var data = {{.r}}[maxError.i];
-var dataSet = [data-maxError.num, maxError.num];
+var selectedError = "";
+switch(maxError.i){
+    case 0 :
+        selectedError = "C1"
+        break;
+    case 1 :
+        selectedError = "C10"
+        break;
+    case 2 :
+        selectedError = "C100"
+        break;
+    case 3 :
+        selectedError = "C1k"
+        break;
+    case 4 :
+        selectedError = "C10k"
+        break;
+    case 5 :
+        selectedError = "C100k"
+        break;
+}
+var dataSet = [data, maxError.num];
 var rpe2c = new Chart(rpe2, {
 type: 'pie',
 data: {
 labels: ["Success Request", "Error"],
 datasets: [{
-label: 'Request',
 data: dataSet,
 backgroundColor: ['rgba(153, 102, 255, 0.2)','rgba(75, 192, 192, 0.2)'],
 borderColor: ['rgba(153, 102, 255, 1)','rgba(75, 192, 192, 1)'],
@@ -555,7 +575,7 @@ options: {
 responsive: true,
 	    title:{
 display: true,
-	 text:"Request And Error Ratio",
+	 text:selectedError + " Request And Error Ratio",
 	 position:"top",
 	 fontColor: '#fff',
 	 fontSize:16,
