@@ -1,5 +1,5 @@
 # Performark
-Web Benchmark to test your API performance
+Web Benchmark to test your API performance. Install in your develop machine and test your api before deployment.
 ### require
 * [wg/wrk](https://github.com/wg/wrk)
 * [golang](https://golang.org/)
