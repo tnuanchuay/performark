@@ -51,6 +51,14 @@ Tags: HTML, Template, Coming Soon, Kite
 
 /* 2 - Global Style
 ---------------------------------------------------------------------- */
+.form-control.hover{
+    color:#000;
+}
+
+option{
+    color:#000;
+}
+
 body{
 	font-family:'Roboto', sans-serif;
 	color:#fff;
