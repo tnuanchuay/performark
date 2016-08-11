@@ -73,11 +73,20 @@
             <form action="/wrk" method="post">
                 <div class="col-sm-12 form-group pull-right">
                     <div class="col-sm-12 row pull-right">
-                        <input type="text" class="form-control pull-right" name="url" placeholder="url...">
-                        <input type="text" class="form-control pull-right" name="body" placeholder="body...">
-                        <select id="testcase" class="form-control pull-right" name="testcase">
-                        </select>
-                        <button class="btn pull-right" type="submit">Benchmark</button>
+                        <div class="form-group">
+                            <label class="label" for="url">URL</label>
+                            <input type="text" id="url" class="form-control pull-right" name="url" placeholder="..." required>
+                        </div>
+                        <div class="form-group">
+                            <label class="label" for="testcase">Testcase</label>
+                            <select id="testcase" class="form-control pull-right" name="testcase">
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="label" for="body">Body/Load</label>
+                            <textarea type="text" id="body" class="form-control pull-right" name="body" placeholder="..."></textarea>
+                        </div>
+                        <button class="btn pull-right" type="submit">Run</button>
                     </div>
                 </div>
             </form>

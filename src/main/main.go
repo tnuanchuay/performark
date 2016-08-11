@@ -220,6 +220,8 @@ func main(){
 	iris.Post("/wrk", func(ctx *iris.Context){
 		bUrl := ctx.FormValue("url")
 		body := string(ctx.FormValue("body"))
+		testcase := string(ctx.FormValue("testcase"))
+
 		ctx.Redirect("/")
 		if bUrl == nil{
 			return;
@@ -227,7 +229,7 @@ func main(){
 
 		url := string(bUrl)
 
-		j := model.Job{}.NewInstance(url, session, body)
+		j := model.Job{}.NewInstance(url, session, body, testcase)
 		modelChan <- j
 	})
 
@@ -253,8 +255,9 @@ func main(){
 			select {
 			case j := <- modelChan:
 				go func() {
+					testsuite := model.Testsuite{}.Find(session, j.TestcaseName)
 					t := j.Unique
-					selectedTestSuite := c1kToC10kTestSuit
+					selectedTestSuite := testsuite
 					for i, testsuite := range selectedTestSuite.Testcase{
 						time.Sleep(10 * time.Second)
 						j.RunWrk(testsuite.Thread, testsuite.Connection, testsuite.Duration, t, mongochan)

@@ -40,3 +40,10 @@ func (Testsuite) GetAll(session *mgo.Session)([]Testsuite){
 	c.Find(bson.M{}).All(&instance)
 	return instance
 }
+
+func (Testsuite) Find(session *mgo.Session, name string)(Testsuite){
+	c := session.DB("performark").C("testsuite")
+	var instance Testsuite
+	c.Find(bson.M{"name":name}).One(&instance)
+	return instance
+}

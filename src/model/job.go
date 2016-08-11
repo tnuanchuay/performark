@@ -17,6 +17,7 @@ type Job struct{
 	Url		string
 	Load		string
 	Label		[]string
+	TestcaseName	string
 }
 
 func (j *Job) Complete(session *mgo.Session){
@@ -66,10 +67,11 @@ func (j *Job) SetLoad(load string) *Job{
 	return j
 }
 
-func (Job) NewInstance(url string, session *mgo.Session, load string) *Job{
+func (Job) NewInstance(url string, session *mgo.Session, load string, testcase string) *Job{
 	t := time.Now().Format("20060102150405")
 	j := Job{Unique:t, IsComplete:false}
 	j.Url = url
+	j.TestcaseName = testcase
 	j.Save(session)
 	if len(load) != 0{
 		j.SetLoad(load)
