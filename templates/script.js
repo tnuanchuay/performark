@@ -15,7 +15,7 @@ var rpe2 = $("#rpe2");
 
 var global = Chart.defaults.global;
 global.defaultFontColor = '#FFF';
-var xLabel = ["c1", "c10", "c100", "c1k", "c10k", "c100k"]
+var xLabel = {{.label}};
 var optTitle = {
 display: true,
 	 text:"Request / Second",
@@ -538,27 +538,7 @@ legend: optLegend,
 });
 
 var data = {{.r}}[maxError.i];
-var selectedError = "";
-switch(maxError.i){
-    case 0 :
-        selectedError = "C1"
-        break;
-    case 1 :
-        selectedError = "C10"
-        break;
-    case 2 :
-        selectedError = "C100"
-        break;
-    case 3 :
-        selectedError = "C1k"
-        break;
-    case 4 :
-        selectedError = "C10k"
-        break;
-    case 5 :
-        selectedError = "C100k"
-        break;
-}
+var selectedError = xLabel[maxError.i];
 var dataSet = [data, maxError.num];
 var rpe2c = new Chart(rpe2, {
 type: 'pie',

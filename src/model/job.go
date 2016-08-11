@@ -16,6 +16,7 @@ type Job struct{
 	IsComplete	bool
 	Url		string
 	Load		string
+	Label		[]string
 }
 
 func (j *Job) Complete(session *mgo.Session){
@@ -27,11 +28,14 @@ func (j *Job) Complete(session *mgo.Session){
 func (j *Job) RunWrk(t, c, d, time string, mongoChan chan WrkResult){
 	url := j.Url
 	var command *exec.Cmd
+
 	if len(j.Load) > 0{
 		command = exec.Command("wrk", "-t"+t, "-c"+c, "-d"+d, "-s", fmt.Sprintf("lua/%s.lua", j.Unique),url)
 	}else{
 		command = exec.Command("wrk", "-t"+t, "-c"+c, "-d"+d, url)
 	}
+
+	j.Label = append(j.Label, c)
 	fmt.Println(command.Args)
 	cmdReader, _ := command.StdoutPipe()
 	scanner := bufio.NewScanner(cmdReader)
@@ -82,7 +86,7 @@ func (Job) GetAllJob(session *mgo.Session) []Job{
 
 func (j *Job) Save(session *mgo.Session){
 	c := session.DB("performark").C("job")
-	c.Insert(j)
+	c.Upsert(bson.M{"unique":j.Unique}, j)
 }
 
 func (Job) Find(session *mgo.Session, unique string)(*Job){

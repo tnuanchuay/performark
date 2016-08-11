@@ -75,6 +75,8 @@
                     <div class="col-sm-12 row pull-right">
                         <input type="text" class="form-control pull-right" name="url" placeholder="url...">
                         <input type="text" class="form-control pull-right" name="body" placeholder="body...">
+                        <select id="testcase" class="form-control pull-right" name="testcase">
+                        </select>
                         <button class="btn pull-right" type="submit">Benchmark</button>
                     </div>
                 </div>
@@ -118,8 +120,15 @@
 <!-- Custom JavaScript Functions -->
 <script type="text/javascript" src="assets/js/jquery.ajaxchimp.min.js"></script>
 <script>
+
+    var index = JSON.parse({{ .testcase }})
     var socket = io();
     $(document).ready(function(){
+
+        for(var i = 0 ; i < index.length ; i++){
+            $("#testcase").append(`<option>${index[i].Name}</option>`);
+        }
+
         $.ajax({
             url:"/api/job",
             success : function(data){

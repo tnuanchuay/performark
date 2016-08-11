@@ -13,34 +13,45 @@ import (
 	"io/ioutil"
 )
 
-type(
-	TestSuit struct{
-		Thread		string
-		Connection	string
-		Duration	string
-	}
-)
+var minimalTestSuite	model.Testsuite
+var c1kToC10kTestSuit	model.Testsuite
 
+func initMinimalTestSuite(session *mgo.Session){
+	minimalTestSuite.SetName("minimal").
+		AddTestcase(model.Testcase{Thread:"1", Connection:"1", Duration:"10s"}).
+		AddTestcase(model.Testcase{Thread:"4", Connection:"10", Duration:"10s"}).
+		AddTestcase(model.Testcase{Thread:"4", Connection:"100", Duration:"10s"}).
+		AddTestcase(model.Testcase{Thread:"4", Connection:"1k", Duration:"10s"}).
+		AddTestcase(model.Testcase{Thread:"4", Connection:"10k", Duration:"10s"}).
+		AddTestcase(model.Testcase{Thread:"4", Connection:"100k", Duration:"10s"}).
+		Save(session)
+}
 
-var minimalTestSuite	[]TestSuit
-
-func initMinimalTestSuite(){
-	minimalTestSuite = append(minimalTestSuite, TestSuit{Thread:"1", Connection:"1", Duration:"10s"})
-	minimalTestSuite = append(minimalTestSuite, TestSuit{Thread:"4", Connection:"10", Duration:"10s"})
-	minimalTestSuite = append(minimalTestSuite, TestSuit{Thread:"4", Connection:"100", Duration:"10s"})
-	minimalTestSuite = append(minimalTestSuite, TestSuit{Thread:"4", Connection:"1k", Duration:"10s"})
-	minimalTestSuite = append(minimalTestSuite, TestSuit{Thread:"4", Connection:"10k", Duration:"10s"})
-	minimalTestSuite = append(minimalTestSuite, TestSuit{Thread:"4", Connection:"100k", Duration:"10s"})
+func initC1kToC10kTestSuit(session *mgo.Session){
+	c1kToC10kTestSuit.SetName("c1k-c10k").
+		AddTestcase(model.Testcase{Thread:"4", Connection:"1k", Duration:"10s"}).
+		AddTestcase(model.Testcase{Thread:"4", Connection:"2k", Duration:"10s"}).
+		AddTestcase(model.Testcase{Thread:"4", Connection:"3k", Duration:"10s"}).
+		AddTestcase(model.Testcase{Thread:"4", Connection:"4k", Duration:"10s"}).
+		AddTestcase(model.Testcase{Thread:"4", Connection:"5k", Duration:"10s"}).
+		AddTestcase(model.Testcase{Thread:"4", Connection:"6k", Duration:"10s"}).
+		AddTestcase(model.Testcase{Thread:"4", Connection:"7k", Duration:"10s"}).
+		AddTestcase(model.Testcase{Thread:"4", Connection:"8k", Duration:"10s"}).
+		AddTestcase(model.Testcase{Thread:"4", Connection:"9k", Duration:"10s"}).
+		AddTestcase(model.Testcase{Thread:"4", Connection:"10k", Duration:"10s"}).
+		Save(session)
 }
 
 func main(){
-	initMinimalTestSuite()
 	session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 		panic(err)
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
+
+	initMinimalTestSuite(session)
+	initC1kToC10kTestSuit(session)
 
 	dat, _ := ioutil.ReadFile("templates/script.js")
 	CHART_SCRIPT := string(dat)
@@ -55,7 +66,9 @@ func main(){
 	iris.Static("/images", "./static/images", 1)
 
 	iris.Get("/", func(ctx *iris.Context){
-		ctx.Render("index.html", nil)
+		testCase := model.Testsuite{}.GetAll(session)
+		jsonTestcase, _ := json.Marshal(testCase)
+		ctx.Render("index.html", map[string]interface{}{"testcase":string(jsonTestcase)})
 	})
 
 	iris.Get("/job/:unique", func(ctx *iris.Context){
@@ -77,6 +90,7 @@ func main(){
 
 	iris.Get("/script/wrk-stats/:unique", func(ctx *iris.Context) {
 		unique := ctx.Param("unique")
+		j := model.Job{}.Find(session, unique)
 		chart := model.Chart{}.NewInstance(unique)
 
 		chart.RetrieveRequestPerSec(session).
@@ -167,6 +181,11 @@ func main(){
 			ctx.JSON(iris.StatusOK, err)
 		}
 
+		label, err := json.Marshal(j.Label)
+		if err != nil{
+			ctx.JSON(iris.StatusOK, err)
+		}
+
 		s := CHART_SCRIPT
 		s = strings.Replace(s, "{{.Unique}}", unique, -1)
 		s = strings.Replace(s, "{{.rps}}", string(jsonrps), -1)
@@ -185,6 +204,7 @@ func main(){
 		s = strings.Replace(s, "{{.et}}", string(jsonet), -1)
 		s = strings.Replace(s, "{{.ex}}", string(jsonex), -1)
 		s = strings.Replace(s, "{{.e}}", string(jsone), -1)
+		s = strings.Replace(s, "{{.label}}", string(label), -1)
 
 		ctx.Text(iris.StatusOK, s)
 	})
@@ -234,13 +254,13 @@ func main(){
 			case j := <- modelChan:
 				go func() {
 					t := j.Unique
-					for i, testsuite := range minimalTestSuite{
-						time.Sleep(2 * time.Second)
+					selectedTestSuite := c1kToC10kTestSuit
+					for i, testsuite := range selectedTestSuite.Testcase{
+						time.Sleep(10 * time.Second)
 						j.RunWrk(testsuite.Thread, testsuite.Connection, testsuite.Duration, t, mongochan)
-						server.
-							BroadcastTo("real-time",
+						server.BroadcastTo("real-time",
 							t,
-							`{"Unique":"` + t + `", "IsComplete":false, "Progress":` + fmt.Sprintf("%.2f", float64((i+1))/float64(len(minimalTestSuite))*100.0) + `}`)
+							`{"Unique":"` + t + `", "IsComplete":false, "Progress":` + fmt.Sprintf("%.2f", float64((i+1))/float64(len(selectedTestSuite.Testcase))*100.0) + `}`)
 					}
 					j.Complete(session)
 					server.BroadcastTo("real-time", t, `{"Unique":"` + t + `", "IsComplete":true, "Progress":100}`)
