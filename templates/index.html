@@ -79,13 +79,15 @@
                         </div>
                         <div class="form-group">
                             <label class="label" for="testcase">Testcase</label>
-                            <select id="testcase" class="form-control pull-right" name="testcase">
+                            <select id="testcase" class="form-control pull-right form-inline" name="testcase">
                             </select>
                         </div>
+                        <div class="form-group"></div>
                         <div class="form-group">
                             <label class="label" for="body">Body/Load</label>
                             <textarea type="text" id="body" class="form-control pull-right" name="body" placeholder="..."></textarea>
                         </div>
+                        <a href="/test/new"><button class="btn pull-right" type="button">New Testsuite</button></a>
                         <button class="btn pull-right" type="submit">Run</button>
                     </div>
                 </div>
@@ -150,6 +152,14 @@
                                     <td>${d.Unique}</td>
                                     <td>${d.Url}</td>
                                     <td><span class="label label-success">finished</span></td>
+                                </tr>
+                            `);
+                        }else if(d.Error){
+                            $("#job").append(`
+                                <tr id="tr_${d.Unique}">
+                                    <td>${d.Unique}</td>
+                                    <td>${d.Url}</td>
+                                    <td><span class="label label-danger">error</span></td>
                                 </tr>
                             `);
                         }else{

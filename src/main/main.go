@@ -53,6 +53,8 @@ func main(){
 	initMinimalTestSuite(session)
 	initC1kToC10kTestSuit(session)
 
+	model.Job{}.SetError(session)
+
 	dat, _ := ioutil.ReadFile("templates/script.js")
 	CHART_SCRIPT := string(dat)
 
@@ -78,6 +80,7 @@ func main(){
 			"Unique":unique,
 			"Url":j.Url,
 			"Load":j.Load,
+			"TestCaseName":j.TestcaseName,
 		})
 	})
 
@@ -212,6 +215,30 @@ func main(){
 	iris.Get("/api/job", func(ctx *iris.Context){
 		j := model.Job{}.GetAllJob(session)
 		ctx.JSON(iris.StatusOK, j)
+	})
+
+	iris.Get("/test/new", func(ctx *iris.Context){
+		ctx.Render("test-new.html", nil)
+	})
+
+	iris.Post("/test/new", func(ctx *iris.Context){
+		name := string(ctx.FormValue("name"))
+		t := ctx.FormValues("t")
+		c := ctx.FormValues("c")
+		d := ctx.FormValues("d")
+		testsuite := model.Testsuite{}
+		for i, t := range t{
+			fmt.Println(t)
+			testcase := model.Testcase{}
+			testcase.Duration = d[i]
+			testcase.Connection = c[i]
+			testcase.Thread = t
+			testsuite.AddTestcase(testcase)
+		}
+		testsuite.Name = name
+		testsuite.Save(session)
+
+		ctx.Redirect("/")
 	})
 
 	modelChan := make(chan *model.Job, 100)

@@ -18,6 +18,7 @@ type Job struct{
 	Load		string
 	Label		[]string
 	TestcaseName	string
+	Error		bool
 }
 
 func (j *Job) Complete(session *mgo.Session){
@@ -101,4 +102,14 @@ func (Job) Find(session *mgo.Session, unique string)(*Job){
 func (Job) Delete(session *mgo.Session, unique string){
 	c := session.DB("performark").C("job")
 	c.Remove(bson.M{"unique":unique})
+}
+
+func (Job) SetError(session *mgo.Session){
+	c := session.DB("performark").C("job")
+	j := []Job{}
+	c.Find(bson.M{"iscomplete":false}).All(&j)
+	for _, jj := range j {
+		jj.Error = true
+		c.Update(bson.M{"unique":jj.Unique}, jj)
+	}
 }

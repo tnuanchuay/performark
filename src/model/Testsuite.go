@@ -7,9 +7,9 @@ import (
 
 type (
 	Testcase struct{
-		Thread		string
-		Connection	string
-		Duration	string
+		Thread		string		`json:"t"`
+		Connection	string		`json:"c"`
+		Duration	string		`json:"d"`
 	}
 
 	Testsuite struct{

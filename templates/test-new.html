@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Performark</title>
+    <meta name="description" content="Kite Coming Soon HTML Template by Jewel Theme" >
+    <meta name="author" content="Jewel Theme">
+
+    <!-- Mobile Specific Meta -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--[if IE]><meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'><![endif]-->
+
+    <!-- Bootstrap  -->
+    <link href="/assets/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- icon fonts font Awesome -->
+    <link href="/assets/css/font-awesome.min.css" rel="stylesheet">
+
+    <!-- Custom Styles -->
+    <link href="/assets/css/style.css" rel="stylesheet">
+
+    <!--[if lt IE 9]>
+    <script src="/assets/js/html5shiv.js"></script>
+    <![endif]-->
+
+</head>
+<body>
+
+
+<!-- Preloader -->
+<div id="preloader">
+    <div id="loader">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="lading"></div>
+    </div>
+</div>
+
+
+
+<div id="main-menu" class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <i class="fa fa-bars"></i>
+        </button>
+
+    </div>
+
+    <nav class="collapse navbar-collapse">
+        <ul id="" class="nav navbar-nav">
+            <li class="active"><a href="/">Back</a></li>
+        </ul>
+    </nav>
+</div>
+
+
+<section id="section" class="section-style" data-background-image="/images/background/page-top.jpg">
+    <div id="new" class="pattern height-resize">
+        <div class="container">
+            <h1 class="site-title">
+                Performark
+            </h1>
+        </div>
+        <div class="container">
+            <div class="form-group">
+                <label class="label" for="t">Thread</label>
+                <input class="form-control" type="text" name="t" id="t">
+            </div>
+            <div class="form-group">
+                <label class="label" for="c">Number of Connection</label>
+                <input class="form-control" id="c" type="text" name="c">
+            </div>
+            <div class="form-group">
+                <label class="label" for="d">Duration</label>
+                <input class="form-control" type="text" name="d" id="d">
+            </div>
+            <div>
+                <button class="btn pull-right" id="add" type="button">Add</button>
+            </div>
+        </div>
+        <div class="container">
+            <form action="/test/new" method="post" id="form">
+                <div class="form-group">
+                    <label for="name" class="label">Test name</label>
+                    <input type="text" name="name" id="name" class="form-control" required>
+                </div>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <td>Connection</td>
+                        <td>Duration</td>
+                        <td></td>
+                    </tr>
+                    </thead>
+                    <tbody id="row"></tbody>
+                </table>
+                <button class="btn pull-right" type="submit">Save</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+
+<footer id="footer-section">
+    <p class="copyright">
+        &copy; <a href="http://demos.jeweltheme.com/kite">Kite</a> 2014-2015, All Rights Reserved. Designed by & Developed by <a href="http://jeweltheme.com">Jewel Theme</a>
+    </p>
+</footer>
+
+
+<!-- jQuery Library -->
+<script type="text/javascript" src="/assets/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript" src="/assets/js/socket.io-1.4.5.js"></script>
+<!-- Modernizr js -->
+<script type="text/javascript" src="/assets/js/modernizr-2.8.0.min.js"></script>
+<!-- Plugins -->
+<script type="text/javascript" src="/assets/js/plugins.js"></script>
+<!-- Custom JavaScript Functions -->
+<script type="text/javascript" src="/assets/js/functions.js"></script>
+<!-- Custom JavaScript Functions -->
+<script type="text/javascript" src="/assets/js/jquery.ajaxchimp.min.js"></script>
+<script>
+    var ii = 0
+    var currentItem = 0;
+    $(document).on('ready', function(){
+
+        $("#add").click(function(){
+            currentItem++;
+            ii++;
+            var duration = $("#d").val();
+            var connection = $("#c").val();
+            var thread = $("#t").val();
+
+            $("#row").append(`
+                <tr id="${ii}">
+                    <td>${connection}</td>
+                    <td>${duration}</td>
+                    <td onclick="remove(${ii})">X<input type="hidden" name="d" value="${duration}"></td>
+                    <td onclick="remove(${ii})">X<input type="hidden" name="c" value="${connection}"></td>
+                    <td onclick="remove(${ii})">X<input type="hidden" name="t" value="${thread}"></td>
+                </tr>
+            `);
+        });
+
+        $("#form").submit(function(){
+            if(currentItem > 0)
+                $("#form").submit();
+            else{
+                alert("No test case out there");
+                event.preventDefault();
+            }
+
+        })
+    });
+
+    function remove(num){
+        currentItem--;
+        $("#"+num).remove();
+    }
+</script>
+
+</body>
+</html>
