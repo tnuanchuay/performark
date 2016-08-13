@@ -156,7 +156,7 @@
                             `);
                         }else if(d.Error){
                             $("#job").append(`
-                                <tr id="tr_${d.Unique}">
+                                <tr id="tr_${d.Unique}" onclick="document.location='/job/${d.Unique}'">
                                     <td>${d.Unique}</td>
                                     <td>${d.Url}</td>
                                     <td><span class="label label-danger">error</span></td>

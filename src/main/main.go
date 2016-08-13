@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"encoding/json"
 	"io/ioutil"
+	"sync"
 )
 
 var minimalTestSuite	model.Testsuite
@@ -52,6 +53,9 @@ func main(){
 
 	initMinimalTestSuite(session)
 	initC1kToC10kTestSuit(session)
+
+	modelChan := make(chan *model.Job, 100)
+	mongochan := make(chan model.WrkResult, 100)
 
 	model.Job{}.SetError(session)
 
@@ -241,9 +245,6 @@ func main(){
 		ctx.Redirect("/")
 	})
 
-	modelChan := make(chan *model.Job, 100)
-	mongochan := make(chan model.WrkResult, 100)
-
 	iris.Post("/wrk", func(ctx *iris.Context){
 		bUrl := ctx.FormValue("url")
 		body := string(ctx.FormValue("body"))
@@ -278,9 +279,11 @@ func main(){
 	iris.Handle(iris.MethodPost, "/socket.io/", iris.ToHandler(server))
 
 	go func(){
+		wg := sync.WaitGroup{}
 		for;;{
 			select {
 			case j := <- modelChan:
+				wg.Add(1)
 				go func() {
 					testsuite := model.Testsuite{}.Find(session, j.TestcaseName)
 					t := j.Unique
@@ -294,8 +297,18 @@ func main(){
 					}
 					j.Complete(session)
 					server.BroadcastTo("real-time", t, `{"Unique":"` + t + `", "IsComplete":true, "Progress":100}`)
+					wg.Done()
 				}()
-			case wrkResult := <- mongochan:
+				wg.Wait()
+
+			}
+		}
+	}()
+
+	go func(){
+		for{
+			select {
+			case wrkResult := <-mongochan:
 				go wrkResult.Save(session)
 			}
 		}
