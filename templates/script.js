@@ -9,6 +9,7 @@ var rpe2 = $("#rpe2");
 
 var global = Chart.defaults.global;
 global.defaultFontColor = '#FFF';
+global.scaleLabel = function (valuePayload) {return valuePayload + '$';};
 var xLabel = {{.label}};
 var errorCanvasGroup = $("#err");
 var errorCanvasChart = [];
@@ -16,10 +17,16 @@ var errorChart = [];
 
 var optScales = {
 yAxes: [{
-ticks: {
-beginAtZero:false
-       }
-       }],
+    ticks: {beginAtZero:false, callback:function(label, index, labels){
+        if(label/1000000 > 1){
+            return label / 1000000 + 'M'
+        }else if(label/1000 > 1){
+            return label / 1000 + 'k'
+        }else {
+            return label
+        }
+    }},
+    }]
 };
 
 var optLegend = {
@@ -109,7 +116,6 @@ for (var i = 0 ; i < xLabel.length ; i++){
         	 fontSize:16,
         	    },
         legend: optLegend,
-        	scales: optScales,
         	hover: optHover,
         	tooltips: optTooltips
         	 }
@@ -367,7 +373,6 @@ display: true,
 	 fontSize:16,
 	    },
 legend: optLegend,
-	scales: optScales,
 	hover: optHover,
 	tooltips: optTooltips
 	 }
