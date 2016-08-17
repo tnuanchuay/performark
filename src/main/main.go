@@ -221,8 +221,16 @@ func main(){
 		ctx.JSON(iris.StatusOK, j)
 	})
 
-	iris.Get("/test/new", func(ctx *iris.Context){
-		ctx.Render("test-new.html", nil)
+	iris.Get("/test/new/custom", func(ctx *iris.Context){
+		ctx.Render("test-new-custom.html", nil)
+	})
+
+	iris.Get("/test/new/timed", func(ctx *iris.Context){
+		ctx.Render("test-new-time.html", nil)
+	})
+
+	iris.Get("/test/new/concd", func(ctx *iris.Context){
+		ctx.Render("test-new-concurrency.html", nil)
 	})
 
 	iris.Post("/test/new", func(ctx *iris.Context){
