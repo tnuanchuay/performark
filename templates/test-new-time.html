@@ -77,10 +77,6 @@
                 <input class="form-control" type="text" name="t" id="t">
             </div>
             <div class="form-group">
-                <label class="label" for="c">Number of Connection</label>
-                <input class="form-control" id="c" type="text" name="c">
-            </div>
-            <div class="form-group">
                 <label class="label" for="d">Duration</label>
                 <input class="form-control" type="text" name="d" id="d">
             </div>
@@ -90,9 +86,14 @@
         </div>
         <div class="container">
             <form action="/test/new" method="post" id="form">
+                <input type="hidden" name="type" value="td">
                 <div class="form-group">
                     <label for="name" class="label">Test name</label>
                     <input type="text" name="name" id="name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="label" for="c">Number of Connection</label>
+                    <input class="form-control" name="c" id="c" type="text" name="c">
                 </div>
                 <table class="table">
                     <thead>
@@ -138,9 +139,10 @@
                 <tr id="${ii}">
                     <td>${connection}</td>
                     <td>${duration}</td>
-                    <td onclick="remove(${ii})">X<input type="hidden" name="d" value="${duration}"></td>
-                    <td onclick="remove(${ii})">X<input type="hidden" name="c" value="${connection}"></td>
-                    <td onclick="remove(${ii})">X<input type="hidden" name="t" value="${thread}"></td>
+                    <td onclick="remove(${ii})">X
+                        <input type="hidden" name="d" value="${duration}">
+                        <input type="hidden" name="t" value="${thread}">
+                    </td>
                 </tr>
             `);
         });

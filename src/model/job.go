@@ -27,7 +27,11 @@ func (j *Job) Complete(session *mgo.Session){
 	c.Upsert(bson.M{"unique":j.Unique}, j)
 }
 
-func (j *Job) RunWrk(t, c, d, time string, mongoChan chan WrkResult){
+func (j *Job) RunWrk(ts Testcase, label string, time string, mongoChan chan WrkResult){
+	t := ts.Thread
+	c := ts.Connection
+	d := ts.Duration
+
 	url := j.Url
 	var command *exec.Cmd
 
@@ -36,8 +40,13 @@ func (j *Job) RunWrk(t, c, d, time string, mongoChan chan WrkResult){
 	}else{
 		command = exec.Command("wrk", "-t"+t, "-c"+c, "-d"+d, url)
 	}
+	fmt.Println("label", label)
+	if label == "time" {
+		j.Label = append(j.Label, d)
+	}else{
+		j.Label = append(j.Label, c)
+	}
 
-	j.Label = append(j.Label, c)
 	fmt.Println(command.Args)
 	cmdReader, _ := command.StdoutPipe()
 	scanner := bufio.NewScanner(cmdReader)

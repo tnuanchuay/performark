@@ -234,21 +234,62 @@ func main(){
 	})
 
 	iris.Post("/test/new", func(ctx *iris.Context){
-		name := string(ctx.FormValue("name"))
-		t := ctx.FormValues("t")
-		c := ctx.FormValues("c")
-		d := ctx.FormValues("d")
-		testsuite := model.Testsuite{}
-		for i, t := range t{
-			fmt.Println(t)
-			testcase := model.Testcase{}
-			testcase.Duration = d[i]
-			testcase.Connection = c[i]
-			testcase.Thread = t
-			testsuite.AddTestcase(testcase)
+		typeForm := string(ctx.FormValue("type"))
+		fmt.Println("typeForm", typeForm)
+		switch typeForm {
+		case "cc":
+			name := string(ctx.FormValue("name"))
+			t := ctx.FormValues("t")
+			c := ctx.FormValues("c")
+			d := ctx.FormValues("d")
+			testsuite := model.Testsuite{}
+			for i, tt := range t{
+				fmt.Println(t)
+				testcase := model.Testcase{}
+				testcase.Duration = d[i]
+				testcase.Connection = c[i]
+				testcase.Thread = tt
+				testsuite.AddTestcase(testcase)
+			}
+			testsuite.Name = name
+			testsuite.Domain = "custom"
+			testsuite.Save(session)
+		case "td":
+			fmt.Println("do time domain")
+			name := string(ctx.FormValue("name"))
+			t := ctx.FormValues("t")
+			c := ctx.FormValue("c")
+			d := ctx.FormValues("d")
+			testsuite := model.Testsuite{}
+			for i, dd := range d{
+				fmt.Println(t)
+				testcase := model.Testcase{}
+				testcase.Duration = dd
+				testcase.Connection = string(c)
+				testcase.Thread = t[i]
+				testsuite.AddTestcase(testcase)
+			}
+			testsuite.Name = name
+			testsuite.Domain = "time"
+			testsuite.Save(session)
+		case "cd":
+			name := string(ctx.FormValue("name"))
+			t := ctx.FormValues("t")
+			c := ctx.FormValues("c")
+			d := ctx.FormValue("d")
+			testsuite := model.Testsuite{}
+			for i, cc := range c{
+				fmt.Println(t)
+				testcase := model.Testcase{}
+				testcase.Duration = string(d)
+				testcase.Connection = cc
+				testcase.Thread = t[i]
+				testsuite.AddTestcase(testcase)
+			}
+			testsuite.Name = name
+			testsuite.Domain = "concurrency"
+			testsuite.Save(session)
 		}
-		testsuite.Name = name
-		testsuite.Save(session)
 
 		ctx.Redirect("/")
 	})
@@ -296,9 +337,9 @@ func main(){
 					testsuite := model.Testsuite{}.Find(session, j.TestcaseName)
 					t := j.Unique
 					selectedTestSuite := testsuite
-					for i, testsuite := range selectedTestSuite.Testcase{
+					for i, testcase := range selectedTestSuite.Testcase {
 						time.Sleep(10 * time.Second)
-						j.RunWrk(testsuite.Thread, testsuite.Connection, testsuite.Duration, t, mongochan)
+						j.RunWrk(testcase, selectedTestSuite.Domain, t, mongochan)
 						server.BroadcastTo("real-time",
 							t,
 							`{"Unique":"` + t + `", "IsComplete":false, "Progress":` + fmt.Sprintf("%.2f", float64((i+1))/float64(len(selectedTestSuite.Testcase))*100.0) + `}`)

@@ -90,6 +90,7 @@
         </div>
         <div class="container">
             <form action="/test/new" method="post" id="form">
+                <input type="hidden" name="type" value="cc">
                 <div class="form-group">
                     <label for="name" class="label">Test name</label>
                     <input type="text" name="name" id="name" class="form-control" required>
@@ -138,9 +139,11 @@
                 <tr id="${ii}">
                     <td>${connection}</td>
                     <td>${duration}</td>
-                    <td onclick="remove(${ii})">X<input type="hidden" name="d" value="${duration}"></td>
-                    <td onclick="remove(${ii})">X<input type="hidden" name="c" value="${connection}"></td>
-                    <td onclick="remove(${ii})">X<input type="hidden" name="t" value="${thread}"></td>
+                    <td onclick="remove(${ii})">X
+                        <input type="hidden" name="d" value="${duration}">
+                        <input type="hidden" name="c" value="${connection}">
+                        <input type="hidden" name="t" value="${thread}">
+                    </td>
                 </tr>
             `);
         });

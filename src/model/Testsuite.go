@@ -14,6 +14,7 @@ type (
 
 	Testsuite struct{
 		Name		string
+		Domain		string
 		Testcase	[]Testcase
 	}
 )
