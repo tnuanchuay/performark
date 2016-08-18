@@ -1,0 +1,9 @@
+language: go
+go:
+  - tip
+install:
+  - go get -u -v github.com/kataras/iris/iris
+  - go get -v github.com/googollee/go-socket.io
+  - go get -v gopkg.in/mgo.v2
+  - go build -o performark src/main/main.go
+script: go test ./...
