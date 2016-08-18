@@ -1,5 +1,5 @@
 # Performark
-[![Build Status](http://jenkins.ntossapo.me:8080/buildStatus/icon?job=performark-master)](http://jenkins.ntossapo.me:8080/job/performark-master/)
+[![Build Status](https://travis-ci.org/ntossapo/performark.svg?branch=master)](https://travis-ci.org/ntossapo/performark)
 
 Web Benchmark to test your API performance. Install in your develop machine and test your api before deployment.
 ### require
