@@ -1,7 +1,7 @@
 # Performark
 [![Build Status](https://travis-ci.org/ntossapo/performark.svg?branch=master)](https://travis-ci.org/ntossapo/performark)
-
-Web Benchmark to test your API performance. Install in your develop machine and test your api before deployment.
+ทดสอบโหลดของเว็บหรือ API โดยใช้ performark ติดตั้งไว้ในเครื่องที่ใช้ในการพัฒนา
+Web Benchmark to test your API performance. Install in your development machine and test your api before deployment.
 ### require
 * [wg/wrk](https://github.com/wg/wrk)
 * [golang](https://golang.org/)
@@ -22,9 +22,5 @@ Web Benchmark to test your API performance. Install in your develop machine and 
 ### Usage-Concept
 * Enter URL to benchmark
 * Enter http body-load if it have
-* run and wait for result
-* see the report
-
-### Screen Shot
-![Home](https://raw.githubusercontent.com/ntossapo/performark/master/screenshot/1.png)
-![Report](https://raw.githubusercontent.com/ntossapo/performark/master/screenshot/2.png)
+* Run and wait for result
+* See the report
