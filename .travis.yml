@@ -2,6 +2,9 @@ language: go
 go:
   - 1.6
   - tip
+
+script: export GOPATH=$(pwd)
+script: go test -v ./src/si...
 install:
   - go get -u -v github.com/kataras/iris/iris
   - go get -v github.com/googollee/go-socket.io
