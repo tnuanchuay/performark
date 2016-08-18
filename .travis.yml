@@ -4,7 +4,7 @@ go:
   - tip
 
 script: export GOPATH=$(pwd)
-script: go test -v ./src/si...
+script: go test -v ./src/unit...
 install:
   - go get -u -v github.com/kataras/iris/iris
   - go get -v github.com/googollee/go-socket.io
