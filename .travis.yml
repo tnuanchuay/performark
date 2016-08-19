@@ -3,10 +3,10 @@ go:
   - 1.6
   - tip
 
-script: export GOPATH=$(pwd)
-script: go test -v ./src/unit...
-script: go build -v -o performark src/main/main.go
 install:
   - go get -u -v github.com/kataras/iris/iris
   - go get -v github.com/googollee/go-socket.io
   - go get -v gopkg.in/mgo.v2
+script: export GOPATH=$(pwd)
+script: go test -v ./src/unit...
+script: go build -v -o performark src/main/main.go
