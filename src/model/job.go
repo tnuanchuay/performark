@@ -70,10 +70,7 @@ func (j *Job) RunWrk(ts Testcase, label string, time string, mongoChan chan WrkR
 
 func (j *Job) SetLoad(load string) *Job{
 	j.Load = load
-	dat, _ := ioutil.ReadFile("lua/default.lua")
-	luaDefaultScript := string(dat)
-	luaCustomScript := strings.Replace(luaDefaultScript, "{{load}}", fmt.Sprintf(`"%s"`, load), -1)
-	ioutil.WriteFile(fmt.Sprintf("lua/%s.lua", j.Unique), []byte(luaCustomScript), 0644)
+	ioutil.WriteFile(fmt.Sprintf("lua/%s.lua", j.Unique), []byte(load), 0644)
 	return j
 }
 
