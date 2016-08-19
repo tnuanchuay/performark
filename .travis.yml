@@ -5,6 +5,7 @@ go:
 
 script: export GOPATH=$(pwd)
 script: go test -v ./src/unit...
+script: go build -v -o performark src/main/main.go
 install:
   - go get -u -v github.com/kataras/iris/iris
   - go get -v github.com/googollee/go-socket.io
