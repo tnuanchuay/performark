@@ -31,6 +31,24 @@ func (Chart) NewInstance(unique string) *Chart{
 	return &Chart{Unique:unique}
 }
 
+func (c *Chart) RetrieveNon2xx3xx(session *mgo.Session)(*Chart){
+	unique := c.Unique
+	data := []WrkResult{}
+	if c.dataSet == nil{
+		col := session.DB("performark").C("mark")
+		col.Find(bson.M{"unique":unique}).All(&data)
+		c.dataSet = data
+	}else{
+		data = c.dataSet
+	}
+
+	for _, one := range data{
+		c.Non2xx3xx = append(c.Non2xx3xx, one.Non2xx3xx)
+	}
+
+	return c
+}
+
 func (c *Chart) RetrieveSocketError(session *mgo.Session)(*Chart){
 	unique := c.Unique
 	data := []WrkResult{}

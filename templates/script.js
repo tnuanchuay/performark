@@ -6,6 +6,7 @@ var requests = $("#requests");
 var transfer = $("#transfer");
 var rpe = $("#rpe");
 var rpe2 = $("#rpe2");
+var rp2xx3xx = $("#rp2xx3xx");
 
 var global = Chart.defaults.global;
 global.defaultFontColor = '#FFF';
@@ -333,7 +334,7 @@ options: {
 responsive: true,
 	    title:{
 display: true,
-	 text:"Request And Error",
+	 text:"Request And Socket Error",
 	 position:"top",
 	 fontColor: '#fff',
 	 fontSize:16,
@@ -345,17 +346,51 @@ legend: optLegend,
 	 }
 });
 
-var data = {{.r}}[maxError.i];
-var selectedError = xLabel[maxError.i];
-var dataSet = [data, maxError.num];
-var rpe2c = new Chart(rpe2, {
-type: 'pie',
+//var data = {{.r}}[maxError.i];
+//var selectedError = xLabel[maxError.i];
+//var dataSet = [data, maxError.num];
+//var rpe2c = new Chart(rpe2, {
+//type: 'pie',
+//data: {
+//labels: ["Success Request", "Error"],
+//datasets: [{
+//data: dataSet,
+//backgroundColor: ['rgba(153, 102, 255, 0.2)','rgba(75, 192, 192, 0.2)'],
+//borderColor: ['rgba(153, 102, 255, 1)','rgba(75, 192, 192, 1)'],
+//borderWidth: 4
+//}]
+//},
+//options: {
+//responsive: true,
+//	    title:{
+//display: true,
+//	 text:selectedError + " Request And Error Ratio",
+//	 position:"top",
+//	 fontColor: '#fff',
+//	 fontSize:16,
+//	    },
+//legend: optLegend,
+//	hover: optHover,
+//	tooltips: optTooltips
+//	 }
+//});
+
+var rp2xx3xxc = new Chart(rp2xx3xx, {
+type: 'line',
 data: {
-labels: ["Success Request", "Error"],
+labels: xLabel,
 datasets: [{
-data: dataSet,
-backgroundColor: ['rgba(153, 102, 255, 0.2)','rgba(75, 192, 192, 0.2)'],
-borderColor: ['rgba(153, 102, 255, 1)','rgba(75, 192, 192, 1)'],
+label: 'Request',
+data: {{.r}},
+backgroundColor: 'rgba(153, 102, 255, 0.2)',
+borderColor: 'rgba(153, 102, 255, 1)',
+borderWidth: 4
+},
+{
+label: 'Non 2xx, 3xx',
+data: {{.rp2xx}},
+backgroundColor: 'rgba(75, 192, 192, 0.2)',
+borderColor: 'rgba(75, 192, 192, 1)',
 borderWidth: 4
 }]
 },
@@ -363,14 +398,14 @@ options: {
 responsive: true,
 	    title:{
 display: true,
-	 text:selectedError + " Request And Error Ratio",
+	 text:"Request And Non 2xx-3xx Response",
 	 position:"top",
 	 fontColor: '#fff',
 	 fontSize:16,
 	    },
 legend: optLegend,
+	scales: optScales,
 	hover: optHover,
 	tooltips: optTooltips
 	 }
 });
-

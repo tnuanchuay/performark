@@ -106,7 +106,8 @@ func main(){
 			RetrieveThread(session).
 			RetrieveRequest(session).
 			RetrieveTransfer(session).
-			RetrieveSocketError(session)
+			RetrieveSocketError(session).
+			RetrieveNon2xx3xx(session)
 
 		jsonrps, err := json.Marshal(chart.RequestPerSec)
 		if err != nil{
@@ -183,6 +184,11 @@ func main(){
 			ctx.JSON(iris.StatusOK, err)
 		}
 
+		rp2xx, err := json.Marshal(chart.Non2xx3xx)
+		if err != nil{
+			ctx.JSON(iris.StatusOK, err)
+		}
+
 		label, err := json.Marshal(j.Label)
 		if err != nil{
 			ctx.JSON(iris.StatusOK, err)
@@ -206,6 +212,7 @@ func main(){
 		s = strings.Replace(s, "{{.et}}", string(jsonet), -1)
 		s = strings.Replace(s, "{{.e}}", string(jsone), -1)
 		s = strings.Replace(s, "{{.label}}", string(label), -1)
+		s = strings.Replace(s, "{{.rp2xx}}", string(rp2xx), -1)
 
 		ctx.Text(iris.StatusOK, s)
 	})
