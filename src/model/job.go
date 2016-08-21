@@ -27,6 +27,11 @@ func (j *Job) Complete(session *mgo.Session){
 	c.Upsert(bson.M{"unique":j.Unique}, j)
 }
 
+func (j *Job)ReRunWrk(session *mgo.Session)(*Job){
+	testsuiteName := j.TestcaseName
+	return Job{}.NewInstance(j.Url, session, j.Load, testsuiteName)
+}
+
 func (j *Job) RunWrk(ts Testcase, label string, time string, mongoChan chan WrkResult){
 	t := ts.Thread
 	c := ts.Connection

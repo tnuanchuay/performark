@@ -310,6 +310,13 @@ func main(){
 		modelChan <- j
 	})
 
+	iris.Get("/rerun/:unique", func(ctx *iris.Context){
+		unique := ctx.Param("unique")
+		job := model.Job{}.Find(session, unique)
+		modelChan <- job.ReRunWrk(session)
+		ctx.Redirect("/")
+	})
+
 	server, err := socketio.NewServer(nil)
 	if err != nil {
 		log.Fatal(err)
