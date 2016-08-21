@@ -57,7 +57,6 @@ var ec = {{.ec}};
 var er = {{.er}};
 var ew = {{.ew}};
 var et = {{.et}};
-var ex = {{.ex}};
 var ee = [];
 var maxError = {
     i : 0,
@@ -69,9 +68,8 @@ for(var i = 0 ; i < ec.length ; i++){
     ee[i].push(er[i]);
     ee[i].push(ew[i]);
     ee[i].push(et[i]);
-    ee[i].push(ex[i]);
 
-    var err = ec[i]+er[i]+ew[i]+et[i]+ex[i]
+    var err = ec[i]+er[i]+ew[i]+et[i]
 
     if(maxError.num <= err){
         maxError.i = i
@@ -85,7 +83,7 @@ for (var i = 0 ; i < xLabel.length ; i++){
     errorChart[i] = new Chart(errorCanvasChart[i], {
         type: 'pie',
         data: {
-        labels: ["Socket Error Connect", "Socket Error Read", "Socket Error Write", "Socket Error Timeout", "Socket Error 2xx or 3xx"],
+        labels: ["Socket Error Connect", "Socket Error Read", "Socket Error Write", "Socket Error Timeout"],
         datasets: [{
         label: 'Request',
         data: ee[i],
@@ -94,14 +92,12 @@ for (var i = 0 ; i < xLabel.length ; i++){
                          'rgba(54, 162, 235, 0.2)',
                          'rgba(255, 206, 86, 0.2)',
                          'rgba(255, 159, 64, 0.2)',
-                         'rgba(75, 192, 192, 0.2)'
                          ],
         borderColor: [
                      'rgba(255, 99, 132, 0.2)',
                      'rgba(54, 162, 235, 0.2)',
                      'rgba(255, 206, 86, 0.2)',
                      'rgba(255, 159, 64, 0.2)',
-                     'rgba(75, 192, 192, 0.2)'
                      ],
         borderWidth: 4
         }]
