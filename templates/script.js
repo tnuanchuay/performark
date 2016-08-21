@@ -7,6 +7,7 @@ var transfer = $("#transfer");
 var rpe = $("#rpe");
 var rpe2 = $("#rpe2");
 var rp2xx3xx = $("#rp2xx3xx");
+var success = $("#success");
 
 var global = Chart.defaults.global;
 global.defaultFontColor = '#FFF';
@@ -399,6 +400,44 @@ responsive: true,
 	    title:{
 display: true,
 	 text:"Request And Non 2xx-3xx Response",
+	 position:"top",
+	 fontColor: '#fff',
+	 fontSize:16,
+	    },
+legend: optLegend,
+	scales: optScales,
+	hover: optHover,
+	tooltips: optTooltips
+	 }
+});
+
+var res = {{.r}};
+var n2x3x = {{.rp2xx}};
+
+var ok = [];
+for( var i = 0; i < res.length; i++){
+    ok.push(res[i]-n2x3x[i]);
+}
+console.log(ok);
+
+var successc = new Chart(success, {
+type: 'line',
+data: {
+labels: xLabel,
+datasets: [
+{
+label: 'Success Response',
+data: ok,
+backgroundColor: 'rgba(75, 192, 192, 0.2)',
+borderColor: 'rgba(75, 192, 192, 1)',
+borderWidth: 4
+}]
+},
+options: {
+responsive: true,
+	    title:{
+display: true,
+	 text:"Success Response",
 	 position:"top",
 	 fontColor: '#fff',
 	 fontSize:16,
