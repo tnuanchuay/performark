@@ -178,11 +178,6 @@ func main(){
 			ctx.JSON(iris.StatusOK, err)
 		}
 
-		jsonex, err := json.Marshal(chart.SocketErrorsNon2xx3xx)
-		if err != nil{
-			ctx.JSON(iris.StatusOK, err)
-		}
-
 		jsone, err := json.Marshal(chart.SocketErrorsTotal)
 		if err != nil{
 			ctx.JSON(iris.StatusOK, err)
@@ -209,7 +204,6 @@ func main(){
 		s = strings.Replace(s, "{{.er}}", string(jsoner), -1)
 		s = strings.Replace(s, "{{.ew}}", string(jsonew), -1)
 		s = strings.Replace(s, "{{.et}}", string(jsonet), -1)
-		s = strings.Replace(s, "{{.ex}}", string(jsonex), -1)
 		s = strings.Replace(s, "{{.e}}", string(jsone), -1)
 		s = strings.Replace(s, "{{.label}}", string(label), -1)
 

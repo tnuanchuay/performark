@@ -27,6 +27,7 @@ type WrkResult struct {
 	TotalTransfer	float64
 	SocketErrors	SocketErrors
 	RawOutput	string
+	Non2xx3xx	int
 }
 
 type SocketErrors struct {
@@ -34,7 +35,6 @@ type SocketErrors struct {
 	Read		int
 	Write		int
 	Timeout		int
-	Non2xx3xx	int
 }
 
 type Latency struct {
@@ -84,7 +84,7 @@ func (t *WrkResult) SetSocketErrors(s string){
 	if len(result) == 1{
 		textError2 := result[0][0]
 		splitedTextError2 := strings.Fields(textError2)[4]
-		socketErrors.Non2xx3xx, _ = strconv.Atoi(splitedTextError2)
+		t.Non2xx3xx, _ = strconv.Atoi(splitedTextError2)
 	}
 	t.SocketErrors = socketErrors
 	fmt.Println("t.SocketErrors", t.SocketErrors)

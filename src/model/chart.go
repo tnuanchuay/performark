@@ -23,7 +23,7 @@ type Chart struct{
 	SocketErrorsRead		[]int
 	SocketErrorsWrite		[]int
 	SocketErrorsTimeOut		[]int
-	SocketErrorsNon2xx3xx		[]int
+	Non2xx3xx			[]int
 }
 
 
@@ -47,9 +47,8 @@ func (c *Chart) RetrieveSocketError(session *mgo.Session)(*Chart){
 		c.SocketErrorsRead = append(c.SocketErrorsRead, one.SocketErrors.Read)
 		c.SocketErrorsWrite = append(c.SocketErrorsWrite, one.SocketErrors.Write)
 		c.SocketErrorsTimeOut = append(c.SocketErrorsTimeOut, one.SocketErrors.Timeout)
-		c.SocketErrorsNon2xx3xx = append(c.SocketErrorsNon2xx3xx, one.SocketErrors.Non2xx3xx)
 		errr := one.SocketErrors
-		sumerr := (errr.Connect + errr.Read + errr.Timeout + errr.Write + errr.Non2xx3xx)
+		sumerr := (errr.Connect + errr.Read + errr.Timeout + errr.Write)
 		c.SocketErrorsTotal = append(c.SocketErrorsTotal, sumerr)
 	}
 
