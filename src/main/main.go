@@ -43,20 +43,29 @@ func initC1kToC10kTestSuit(session *mgo.Session){
 		Save(session)
 }
 
-func main(){
+func initMongoSession() *mgo.Session{
 	session, err := mgo.Dial("127.0.0.1")
 	if err != nil {
 		panic(err)
 	}
 	defer session.Close()
 	session.SetMode(mgo.Monotonic, true)
+	return session
+}
 
+func initBasicTestcase(session *mgo.Session){
 	initMinimalTestSuite(session)
 	initC1kToC10kTestSuit(session)
+}
 
-	modelChan := make(chan *model.Job, 100)
-	mongochan := make(chan model.WrkResult, 100)
+func createBasicChannel()(chan *model.Job, chan model.WrkResult){
+	return make(chan *model.Job, 100), make(chan model.WrkResult, 100)
+}
 
+func main(){
+	session := initMongoSession()
+	initBasicTestcase(session)
+	modelchan, mongochan := createBasicChannel()
 	model.Job{}.SetError(session)
 
 	dat, _ := ioutil.ReadFile("templates/script.js")
@@ -299,22 +308,24 @@ func main(){
 		bUrl := ctx.FormValue("url")
 		body := string(ctx.FormValue("body"))
 		testcase := string(ctx.FormValue("testcase"))
+		name := string(ctx.FormValue("name"))
 
 		ctx.Redirect("/")
+
 		if bUrl == nil{
 			return;
 		}
-
 		url := string(bUrl)
+		
 
-		j := model.Job{}.NewInstance(url, session, body, testcase)
-		modelChan <- j
+		j := model.Job{}.NewInstance(url, session, body, testcase, name)
+		modelchan <- j
 	})
 
 	iris.Get("/rerun/:unique", func(ctx *iris.Context){
 		unique := ctx.Param("unique")
 		job := model.Job{}.Find(session, unique)
-		modelChan <- job.ReRunWrk(session)
+		modelchan <- job.ReRunWrk(session)
 		ctx.Redirect("/")
 	})
 
@@ -339,7 +350,7 @@ func main(){
 		wg := sync.WaitGroup{}
 		for;;{
 			select {
-			case j := <- modelChan:
+			case j := <-modelchan:
 				wg.Add(1)
 				go func() {
 					testsuite := model.Testsuite{}.Find(session, j.TestcaseName)
