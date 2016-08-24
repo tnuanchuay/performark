@@ -74,27 +74,47 @@
             <form action="/wrk" method="post">
                 <div class="col-sm-12 form-group pull-right">
                     <div class="col-sm-12 row pull-right">
+
                         <div class="form-group">
                             <label class="label" for="url">URL</label>
-                            <input type="text" id="url" class="form-control pull-right" name="url" placeholder="example http://127.0.0.1/api" required>
+                            <input type="text" id="url" class="form-control" name="url" placeholder="example http://127.0.0.1/api" required>
                         </div>
                         <div class="form-group">
                             <label class="label" for="testcase">Testcase</label>
-                            <select id="testcase" class="form-control pull-right form-inline" name="testcase">
+                            <select id="testcase" class="form-control form-inline" name="testcase">
                             </select>
                         </div>
-                        <div class="form-group"></div>
                         <div class="form-group">
-                            <label class="label" for="body">Wrk Lua Script</label>
-                            <textarea type="text" id="body" class="form-control pull-right" name="body" placeholder="..." rows="5"></textarea>
-                            <div class="container">
-                                --Example<br>
-                                wrk.method = "POST"<br>
-                                wrk.body   = (some load)<br>
-                                wrk.headers["Content-Type"] = "application/x-www-form-urlencoded"<br>
-                            </div>
+                            <label class="label" for="method">Method</label>
+                            <select id="method" class="form-control form-inline" name="method">
+                                <option>GET</option>
+                                <option>POST</option>
+                                <option>PUT</option>
+                                <option>DELETE</option>
+                            </select>
                         </div>
-                        <button class="btn pull-right" type="submit">Run</button>
+                        <div class="form-group">
+                            <label class="label" for="load-from-url">Load input field form url</label>
+                            <input id="load-from-url" type="text" class="form-control form-inline"/>
+                            <button class="btn pull-right" type="button">Load</button>
+                        </div>
+                        <div class="form-group">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <td></td>
+                                    <td>
+                                        <button id="addkey" type="button" class="btn pull-right">Add Body Field</button>
+                                    </td>
+                                </tr>
+                                </thead>
+                                <tbody id="field-table">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-sm-12">
+                            <button class="btn pull-right" type="submit">Run</button>
+                        </div>
                     </div>
                 </div>
             </form>
@@ -133,6 +153,17 @@
     var index = JSON.parse({{ .testcase }})
     var socket = io();
     $(document).ready(function(){
+
+        $("#addkey").click(function(){
+            $("#field-table").append(`
+                <tr>
+                    <td><input type="text" placeholder="key" name="key" class="form-control"></td>
+                    <td><input type="text" placeholder="value" name="value" class="form-control"></td>
+                </tr>
+            `)
+        })
+
+        $("#addkey").click();
 
         for(var i = 0 ; i < index.length ; i++){
             $("#testcase").append(`<option>${index[i].Name}</option>`);
