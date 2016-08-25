@@ -23,9 +23,9 @@ func (r *Request) GenerateScript(filename string){
 }
 
 func (r *Request) KeyValueToLoad(keyValue map[string]string){
-	for _, key := range keyValue{
+	for key, value := range keyValue{
 		if len(key) > 0 {
-			r.Load += key + "=" + keyValue[key] + "&"
+			r.Load += key + "=" + value + "&"
 		}
 	}
 }
