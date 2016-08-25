@@ -12,6 +12,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"sync"
+	"github.com/PuerkitoBio/goquery"
 )
 
 var minimalTestSuite	model.Testsuite
@@ -344,6 +345,38 @@ func main(){
 		job := model.Job{}.Find(session, unique)
 		modelchan <- job.ReRunWrk(session)
 		ctx.Redirect("/")
+	})
+
+	iris.Post("/lfu", func(ctx *iris.Context){
+		url := string(ctx.FormValue("url"))
+		fmt.Println(url)
+
+		doc, err := goquery.NewDocument(url)
+		if err != nil {
+			ctx.JSON(iris.StatusBadRequest, map[string]string{"status":"err", "err":err.Error()})
+			return;
+		}
+
+		var form [][]string
+
+
+		doc.Find("form").Each(func(i int, s *goquery.Selection){
+			var key []string
+			s.Find("input").Each(func(j int, t *goquery.Selection){
+				fmt.Println(j)
+				for k := 0 ; k < len(t.Nodes) ; k++{
+					for l := 0 ; l < len(t.Nodes[k].Attr) ; l++{
+						if t.Nodes[k].Attr[l].Key == "name"{
+							fmt.Println(t.Nodes[k].Attr[l].Key)
+							key = append(key, t.Nodes[k].Attr[l].Val)
+						}
+					}
+				}
+			})
+			form = append(form, key)
+		})
+
+		ctx.JSON(iris.StatusOK, map[string]interface{}{"status":"ok", "data":form})
 	})
 
 	server, err := socketio.NewServer(nil)

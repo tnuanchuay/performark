@@ -6,6 +6,8 @@ echo 'Getting go-socket.io'
 go get -v github.com/googollee/go-socket.io
 echo 'Getting mgo.v2'
 go get -v gopkg.in/mgo.v2
+echo 'Getting goquery'
+go get github.com/PuerkitoBio/goquery
 echo 'Building performark...'
 go build -o performark src/main/main.go
 echo 'done'

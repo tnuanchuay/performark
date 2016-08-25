@@ -99,7 +99,7 @@
                         <div class="form-group">
                             <label class="label" for="load-from-url">Load input field form url</label>
                             <input id="load-from-url" type="text" class="form-control form-inline"/>
-                            <button class="btn pull-right" type="button">Load</button>
+                            <button class="btn pull-right" type="button" id="load">Load</button>
                         </div>
                         <div class="form-group">
                             <table class="table">
@@ -171,6 +171,31 @@
         for(var i = 0 ; i < index.length ; i++){
             $("#testcase").append(`<option>${index[i].Name}</option>`);
         }
+
+        $("#load").click(function(){
+            var url = $("#load-from-url").val();
+            $.post("/lfu", {"url":url})
+            .done(
+                function(data){
+                    data = data.data;
+                    console.log(data);
+                    $("#field-table").html("");
+                    for(var i = 0 ; i < data[0].length ; i++){
+                        $("#field-table").append(`
+                            <tr>
+                                <td><input type="text" placeholder="key" name="key" class="form-control" value="${data[0][i]}"></td>
+                                <td><input type="text" placeholder="value" name="value" class="form-control"></td>
+                            </tr>
+                        `)
+                    }
+                }
+            ).error(
+                function(err){
+                    var e = JSON.parse(err.responseText);
+                    alert(e.err);
+                }
+            )
+        })
 
         $.ajax({
             url:"/api/job",
