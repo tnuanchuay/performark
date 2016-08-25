@@ -79,6 +79,11 @@
                             <input type="text" id="name" class="form-control" name="name" placeholder="">
                         </div>
                         <div class="form-group">
+                            <label class="label" for="load-from-url">Load input field form url</label>
+                            <input id="load-from-url" type="text" class="form-control form-inline"/>
+                            <button class="btn pull-right" type="button" id="load">Load</button>
+                        </div>
+                        <div class="form-group">
                             <label class="label" for="url">URL</label>
                             <input type="text" id="url" class="form-control" name="url" placeholder="example http://127.0.0.1/api" required>
                         </div>
@@ -95,11 +100,6 @@
                                 <option>PUT</option>
                                 <option>DELETE</option>
                             </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="label" for="load-from-url">Load input field form url</label>
-                            <input id="load-from-url" type="text" class="form-control form-inline"/>
-                            <button class="btn pull-right" type="button" id="load">Load</button>
                         </div>
                         <div class="form-group">
                             <table class="table">
@@ -177,13 +177,13 @@
             $.post("/lfu", {"url":url})
             .done(
                 function(data){
-                    data = data.data;
+                    var form = data.data[0];
                     console.log(data);
                     $("#field-table").html("");
-                    for(var i = 0 ; i < data[0].length ; i++){
+                    for(var i = 0 ; i < form.Input.length ; i++){
                         $("#field-table").append(`
                             <tr>
-                                <td><input type="text" placeholder="key" name="key" class="form-control" value="${data[0][i]}"></td>
+                                <td><input type="text" placeholder="key" name="key" class="form-control" value="${form.Input[i].Name}"></td>
                                 <td><input type="text" placeholder="value" name="value" class="form-control"></td>
                             </tr>
                         `)

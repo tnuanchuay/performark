@@ -357,26 +357,23 @@ func main(){
 			return;
 		}
 
-		var form [][]string
-
+		var forms []model.Form
 
 		doc.Find("form").Each(func(i int, s *goquery.Selection){
-			var key []string
+			var form model.Form
+			form.Action, _ = s.Attr("action")
+			form.Method, _ = s.Attr("method")
 			s.Find("input").Each(func(j int, t *goquery.Selection){
-				fmt.Println(j)
 				for k := 0 ; k < len(t.Nodes) ; k++{
-					for l := 0 ; l < len(t.Nodes[k].Attr) ; l++{
-						if t.Nodes[k].Attr[l].Key == "name"{
-							fmt.Println(t.Nodes[k].Attr[l].Key)
-							key = append(key, t.Nodes[k].Attr[l].Val)
-						}
-					}
+					var input model.Input
+					input.Name,_ = t.Attr("name")
+					form.Input = append(form.Input, input)
 				}
 			})
-			form = append(form, key)
+			forms = append(forms, form)
 		})
 
-		ctx.JSON(iris.StatusOK, map[string]interface{}{"status":"ok", "data":form})
+		ctx.JSON(iris.StatusOK, map[string]interface{}{"status":"ok", "data":forms})
 	})
 
 	server, err := socketio.NewServer(nil)
@@ -433,4 +430,5 @@ func main(){
 	}()
 
 	iris.Listen(":8080")
+
 }
