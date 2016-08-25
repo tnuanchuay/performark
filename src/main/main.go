@@ -63,7 +63,13 @@ func createBasicChannel()(chan *model.Job, chan model.WrkResult){
 }
 
 func main(){
-	session := initMongoSession()
+	session, err := mgo.Dial("127.0.0.1")
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+	session.SetMode(mgo.Monotonic, true)
+
 	initBasicTestcase(session)
 	modelchan, mongochan := createBasicChannel()
 	model.Job{}.SetError(session)
@@ -91,8 +97,9 @@ func main(){
 		j := model.Job{}.Find(session, unique)
 		ctx.Render("job.html", map[string]interface{}{
 			"Unique":unique,
-			"Url":j.Url,
-			"Load":j.Load,
+			"Name":j.Name,
+			"Url":j.Request.Url,
+			"Load":j.Request.Load,
 			"TestCaseName":j.TestcaseName,
 		})
 	})
@@ -306,9 +313,11 @@ func main(){
 
 	iris.Post("/wrk", func(ctx *iris.Context){
 		bUrl := ctx.FormValue("url")
-		body := string(ctx.FormValue("body"))
 		testcase := string(ctx.FormValue("testcase"))
 		name := string(ctx.FormValue("name"))
+		method := string(ctx.FormValue("method"))
+		keys := ctx.FormValues("key")
+		values := ctx.FormValues("value")
 
 		ctx.Redirect("/")
 
@@ -316,9 +325,17 @@ func main(){
 			return;
 		}
 		url := string(bUrl)
-		
 
-		j := model.Job{}.NewInstance(url, session, body, testcase, name)
+		keyValue := map[string]string{}
+		for i, key := range keys{
+			keyValue[key] = values[i]
+		}
+
+		r := model.Request{}
+		r.Url = url
+		r.Method = method
+		r.KeyValueToLoad(keyValue)
+		j := model.Job{}.NewInstance(session, testcase, name, r)
 		modelchan <- j
 	})
 

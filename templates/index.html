@@ -128,7 +128,7 @@
             <table class="table table-hover">
                 <thead>
                 <tr class="job-row">
-                    <td>unique</td>
+                    <td>Name</td>
                     <td>path</td>
                     <td>status</td>
                 </tr>
@@ -175,30 +175,31 @@
         $.ajax({
             url:"/api/job",
             success : function(data){
+                console.log(data);
                 if(data.length > 0){
                     for(var i = 0 ; i < data.length ; i++){
                         var d = data[i];
                         if(d.IsComplete){
                             $("#job").append(`
                                 <tr id="tr_${d.Unique}" onclick="document.location='/job/${d.Unique}'">
-                                    <td>${d.Unique}</td>
-                                    <td>${d.Url}</td>
+                                    <td>${d.Name}</td>
+                                    <td>${d.Request.Url}</td>
                                     <td><span class="label label-success">finished</span></td>
                                 </tr>
                             `);
                         }else if(d.Error){
                             $("#job").append(`
                                 <tr id="tr_${d.Unique}" onclick="document.location='/job/${d.Unique}'">
-                                    <td>${d.Unique}</td>
-                                    <td>${d.Url}</td>
+                                    <td>${d.Name}</td>
+                                    <td>${d.Request.Url}</td>
                                     <td><span class="label label-danger">error</span></td>
                                 </tr>
                             `);
                         }else{
                             $("#job").append(`
                             <tr id="tr_${d.Unique}">
-                                <td>${d.Unique}</td>
-                                <td>${d.Url}</td>
+                                <td>${d.Name}</td>
+                                <td>${d.Request.Url}</td>
                                 <td><span class="label label-primary">waiting...</span></td>
                             </tr>
                             `);

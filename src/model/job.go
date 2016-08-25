@@ -8,15 +8,13 @@ import (
 	"fmt"
 	"bufio"
 	"strings"
-	"io/ioutil"
 )
 
 type Job struct{
 	Name		string
 	Unique		string
 	IsComplete	bool
-	Url		string
-	Load		string
+	Request		Request
 	Label		[]string
 	TestcaseName	string
 	Error		bool
@@ -30,8 +28,7 @@ func (j *Job) Complete(session *mgo.Session){
 }
 
 func (j *Job)ReRunWrk(session *mgo.Session)(*Job){
-	testsuiteName := j.TestcaseName
-	return Job{}.NewInstance(j.Url, session, j.Load, testsuiteName)
+	return Job{}.NewInstance(session, j.TestcaseName, j.Name, j.Request)
 }
 
 func (j *Job) RunWrk(ts Testcase, label string, time string, mongoChan chan WrkResult){
@@ -39,14 +36,11 @@ func (j *Job) RunWrk(ts Testcase, label string, time string, mongoChan chan WrkR
 	c := ts.Connection
 	d := ts.Duration
 
-	url := j.Url
+	url := j.Request.Url
 	var command *exec.Cmd
 
-	if len(j.Load) > 0{
-		command = exec.Command("wrk", "-t"+t, "-c"+c, "-d"+d, "-s", fmt.Sprintf("lua/%s.lua", j.Unique),url)
-	}else{
-		command = exec.Command("wrk", "-t"+t, "-c"+c, "-d"+d, url)
-	}
+	command = exec.Command("wrk", "-t"+t, "-c"+c, "-d"+d, "-s", fmt.Sprintf("lua/%s.lua", j.Unique),url)
+
 	fmt.Println("label", label)
 	if label == "time" {
 		j.Label = append(j.Label, d)
@@ -75,22 +69,14 @@ func (j *Job) RunWrk(ts Testcase, label string, time string, mongoChan chan WrkR
 	mongoChan <- wrkResult
 }
 
-func (j *Job) SetBody(load string) *Job{
-	j.Load = load
-	ioutil.WriteFile(fmt.Sprintf("lua/%s.lua", j.Unique), []byte(load), 0644)
-	return j
-}
-
-func (Job) NewInstance(url string, session *mgo.Session, load, testcase, name string) *Job{
+func (Job) NewInstance(session *mgo.Session, testcase, name string, request Request) *Job{
 	t := time.Now().Format("20060102150405")
 	j := Job{Unique:t, IsComplete:false}
-	j.Url = url
 	j.TestcaseName = testcase
 	j.Name = name
+	request.GenerateScript(t)
+	j.Request = request
 	j.Save(session)
-	if len(load) != 0{
-		j.SetBody(load)
-	}
 	return &j
 }
 
