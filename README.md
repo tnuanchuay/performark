@@ -12,6 +12,7 @@ Web Benchmark to test your API performance. Install in your development machine 
 
 ### Available
 * Linux
+* OSX
 
 ### Installation
 ```
