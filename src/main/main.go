@@ -13,6 +13,8 @@ import (
 	"io/ioutil"
 	"sync"
 	"github.com/PuerkitoBio/goquery"
+	"net/http"
+	"errors"
 )
 
 var minimalTestSuite	model.Testsuite
@@ -351,8 +353,52 @@ func main(){
 		url := string(ctx.FormValue("url"))
 		fmt.Println(url)
 
-		doc, err := goquery.NewDocument(url)
+		client := http.Client{
+			CheckRedirect: func(req *http.Request, via []*http.Request) error {
+				log.Println("redirect", req.URL)
+				if len(via) >= 10 {
+					return errors.New("stopped after 10 redirects")
+				}
+				return nil
+			},
+		}
+
+		req, err := http.NewRequest("GET", url, nil)
 		if err != nil {
+			fmt.Println(err)
+		}
+		req.Header.Add("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36")
+
+		resp, err := client.Do(req)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		cookie := resp.Cookies()[0]
+		fmt.Println(cookie)
+		i := 0
+
+		for resp.StatusCode == 302{
+			req, err := http.NewRequest("GET", url, nil)
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			req.Header.Add("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36")
+			req.AddCookie(cookie)
+			resp, err = client.Do(req)
+
+			i++
+			if i > 30 {
+				ctx.JSON(iris.StatusBadRequest, map[string]string{"status":"err", "err":errors.New("too many redirect").Error()})
+				return;
+			}
+		}
+
+
+		doc, err := goquery.NewDocumentFromResponse(resp)
+		if err != nil {
+			fmt.Println(err)
 			ctx.JSON(iris.StatusBadRequest, map[string]string{"status":"err", "err":err.Error()})
 			return;
 		}

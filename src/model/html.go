@@ -9,5 +9,6 @@ type (
 
 	Input	struct{
 		Name	string
+		Value	string
 	}
 )
