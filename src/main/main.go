@@ -426,7 +426,9 @@ func main(){
 		id1 := ctx.Param("id1")
 		var jobs []model.Job
 		jobs = model.Job{}.FindNotLikeThis(session, id1)
-		ctx.JSON(iris.StatusOK, jobs)
+		id1Job := model.Job{}.Find(session, id1)
+		fmt.Println(len(jobs))
+		ctx.Render("compare.html", map[string]interface{}{"Id1":id1Job})
 	})
 
 	server, err := socketio.NewServer(nil)
