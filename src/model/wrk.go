@@ -240,3 +240,10 @@ func (WrkResult) Delete(session *mgo.Session, unique string){
 	c := session.DB("performark").C("mark")
 	c.Remove(bson.M{"unique":unique})
 }
+
+func (WrkResult) FindByUnique(session *mgo.Session, unique string) []WrkResult{
+	var result []WrkResult
+	c := session.DB("performark").C("mark")
+	c.Find(bson.M{"unique":unique}).All(&result)
+	return result
+}

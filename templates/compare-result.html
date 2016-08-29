@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Performark</title>
+    <meta name="description" content="Kite Coming Soon HTML Template by Jewel Theme" >
+    <meta name="author" content="Jewel Theme">
+
+    <!-- Mobile Specific Meta -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--[if IE]><meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'><![endif]-->
+
+    <!-- Bootstrap  -->
+    <link href="/assets/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- icon fonts font Awesome -->
+    <link href="/assets/css/font-awesome.min.css" rel="stylesheet">
+
+    <!-- Custom Styles -->
+    <link href="/assets/css/style.css" rel="stylesheet">
+
+    <!--[if lt IE 9]>
+    <script src="/assets/js/html5shiv.js"></script>
+    <![endif]-->
+
+</head>
+<body>
+
+
+<!-- Preloader -->
+<div id="preloader">
+    <div id="loader">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="lading"></div>
+    </div>
+</div>
+
+
+
+<div id="main-menu" class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <i class="fa fa-bars"></i>
+        </button>
+    </div>
+    <nav class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+            <li ><a href="/">Back</a></li>
+            <li ><a href="/rerun/{{ .Unique }}">Run Again</a></li>
+            <li ><a href="/compare/{{ .Unique }}">Compare With</a></li>
+            <li ><a href="/delete/{{ .Unique }}">Delete</a></li>
+        </ul>
+    </nav>
+</div>
+
+
+<section id="result" class="section-style" data-background-image="/images/background/about-us.jpg">
+    <div id="new" class="pattern height-resize">
+        <div class="container chart">
+            <div class="pull-left">
+
+            </div>
+            <div class="col-sm-12"><canvas id="rps"></canvas></div>
+            <!--<div class="col-sm-12"><canvas id="rpe2"></canvas></div>-->
+        </div>
+    </div>
+</section>
+
+<!-- jQuery Library -->
+<script type="text/javascript" src="/assets/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript" src="/assets/js/socket.io-1.4.5.js"></script>
+<!-- Modernizr js -->
+<script type="text/javascript" src="/assets/js/modernizr-2.8.0.min.js"></script>
+<!-- Plugins -->
+<script type="text/javascript" src="/assets/js/plugins.js"></script>
+<!-- Custom JavaScript Functions -->
+<script type="text/javascript" src="/assets/js/functions.js"></script>
+<script type="text/javascript" src="/assets/js/normal-chart.js"></script>
+<!-- Custom JavaScript Functions -->
+<script type="text/javascript" src="/assets/js/jquery.ajaxchimp.min.js"></script>
+<script src="/assets/js/Chart.min.js"></script>
+<script>
+    var rps = $("#rps");
+    var rpsc = new Chart(rps, {
+        type: 'line',
+        data: {
+            labels: {{ .Data.Label }},
+            datasets: [
+                {
+                    label: {{ .Data.Job1.Job.Name }},
+                    data: {{ .Data.RequestPerSec1 }},
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 4
+                },
+                {
+                    label: {{ .Data.Job2.Job.Name }},
+                    data: {{ .Data.RequestPerSec2 }},
+                    backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                    borderColor: 'rgba(255, 206, 86, 1)',
+                    borderWidth: 4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+	        title:{
+                display: true,
+	            text:"Request / Second",
+	            position:"top",
+	            fontColor: '#fff',
+	            fontSize:16,
+	        },
+            legend: optLegend,
+	        scales: optScales,
+	        hover: optHover,
+	        tooltips: optTooltips
+	    }
+    });
+</script>
+
+</body>
+</html>

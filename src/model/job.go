@@ -10,16 +10,18 @@ import (
 	"strings"
 )
 
-type Job struct{
-	Name		string
-	Unique		string
-	IsComplete	bool
-	Request		Request
-	Label		[]string
-	TestcaseName	string
-	Error		bool
-	Script		string
-}
+type (
+	Job struct{
+		Name		string
+		Unique		string
+		IsComplete	bool
+		Request		Request
+		Label		[]string
+		TestcaseName	string
+		Error		bool
+		Script		string
+	}
+)
 
 func (j *Job) Complete(session *mgo.Session){
 	j.IsComplete = true
