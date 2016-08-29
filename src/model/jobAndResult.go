@@ -16,6 +16,10 @@ type (
 		Job2	JobAndResult
 		RequestPerSec1	[]float64
 		RequestPerSec2	[]float64
+		SocketError1	[]int
+		SocketError2	[]int
+		Success1	[]int
+		Success2	[]int
 		Label		[]string
 	}
 )
@@ -49,6 +53,24 @@ func (c *Compare) generateGraph(){
 	for i, result := range c.Job1.Result{
 		c.RequestPerSec1 = append(c.RequestPerSec1, result.RequestPerSec)
 		c.RequestPerSec2 = append(c.RequestPerSec2, c.Job2.Result[i].RequestPerSec)
+	}
+
+	//generate socket-error
+	for i, result := range c.Job1.Result{
+		error1 := result.SocketErrors
+		error2 := c.Job2.Result[i].SocketErrors
+		sumError1 := error1.Connect + error1.Read + error1.Timeout + error1.Write
+		sumError2 := error2.Connect + error2.Read + error2.Timeout + error2.Write
+		c.SocketError1 = append(c.SocketError1, sumError1)
+		c.SocketError2 = append(c.SocketError2, sumError2)
+	}
+
+	//generate success response
+	for i, result := range c.Job1.Result{
+		success1 := result.Requests - result.Non2xx3xx
+		success2 := c.Job2.Result[i].Requests - c.Job2.Result[i].Non2xx3xx
+		c.Success1 = append(c.Success1, success1)
+		c.Success2 = append(c.Success2, success2)
 	}
 }
 
