@@ -113,3 +113,11 @@ func (Job) SetError(session *mgo.Session){
 		c.Update(bson.M{"unique":jj.Unique}, jj)
 	}
 }
+
+func (Job) FindNotLikeThis(session *mgo.Session, unique string) []Job{
+	c := session.DB("performark").C("job")
+	result  := []Job{}
+	err := c.Find(bson.M{"unique":bson.M{"$ne":"20160827191344"}}).All(&result)
+	fmt.Println(err)
+	return result
+}

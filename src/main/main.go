@@ -422,6 +422,13 @@ func main(){
 		ctx.JSON(iris.StatusOK, map[string]interface{}{"status":"ok", "data":forms})
 	})
 
+	iris.Get("/compare/:id1", func(ctx *iris.Context){
+		id1 := ctx.Param("id1")
+		var jobs []model.Job
+		jobs = model.Job{}.FindNotLikeThis(session, id1)
+		ctx.JSON(iris.StatusOK, jobs)
+	})
+
 	server, err := socketio.NewServer(nil)
 	if err != nil {
 		log.Fatal(err)
