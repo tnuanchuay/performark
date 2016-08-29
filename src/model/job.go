@@ -10,16 +10,18 @@ import (
 	"strings"
 )
 
-type Job struct{
-	Name		string
-	Unique		string
-	IsComplete	bool
-	Request		Request
-	Label		[]string
-	TestcaseName	string
-	Error		bool
-	Script		string
-}
+type (
+	Job struct{
+		Name		string
+		Unique		string
+		IsComplete	bool
+		Request		Request
+		Label		[]string
+		TestcaseName	string
+		Error		bool
+		Script		string
+	}
+)
 
 func (j *Job) Complete(session *mgo.Session){
 	j.IsComplete = true
@@ -112,4 +114,12 @@ func (Job) SetError(session *mgo.Session){
 		jj.Error = true
 		c.Update(bson.M{"unique":jj.Unique}, jj)
 	}
+}
+
+func (Job) FindNotLikeThis(session *mgo.Session, unique string) []Job{
+	c := session.DB("performark").C("job")
+	result  := []Job{}
+	err := c.Find(bson.M{"unique":bson.M{"$ne":fmt.Sprintf("%s", unique)}}).All(&result)
+	fmt.Println(err)
+	return result
 }

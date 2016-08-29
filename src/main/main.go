@@ -422,6 +422,28 @@ func main(){
 		ctx.JSON(iris.StatusOK, map[string]interface{}{"status":"ok", "data":forms})
 	})
 
+	iris.Get("/compare/:id1", func(ctx *iris.Context){
+		id1 := ctx.Param("id1")
+		var jobs []model.Job
+		jobs = model.Job{}.FindNotLikeThis(session, id1)
+		id1Job := model.Job{}.Find(session, id1)
+		fmt.Println(len(jobs))
+		ctx.Render("compare.html", map[string]interface{}{"Id1":id1Job})
+	})
+
+	iris.Get("/compare/:id1/:id2", func(ctx *iris.Context){
+		id1 := ctx.Param("id1")
+		id2 := ctx.Param("id2")
+
+		compare, err := model.Compare{}.New(session, id1, id2)
+		if err != nil {
+			ctx.Write(err.Error())
+			return;
+		}
+
+		ctx.Render("compare-result.html", map[string]interface{}{"Data":compare})
+	})
+
 	server, err := socketio.NewServer(nil)
 	if err != nil {
 		log.Fatal(err)
