@@ -428,7 +428,7 @@ func main(){
 		jobs = model.Job{}.FindNotLikeThis(session, id1)
 		id1Job := model.Job{}.Find(session, id1)
 		fmt.Println(len(jobs))
-		ctx.Render("compare.html", map[string]interface{}{"Id1":id1Job})
+		ctx.Render("compare.html", map[string]interface{}{"Id1":id1Job, "data":jobs})
 	})
 
 	iris.Get("/compare/:id1/:id2", func(ctx *iris.Context){

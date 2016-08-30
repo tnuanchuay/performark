@@ -101,30 +101,24 @@
 <!-- Custom JavaScript Functions -->
 <script type="text/javascript" src="/assets/js/jquery.ajaxchimp.min.js"></script>
 <script>
-    $(document).ready(function(){
-        $.ajax({
-            url:"/api/job",
-            success : function(data){
-                console.log(data);
-                if(data.length > 0){
-                    for(var i = 0 ; i < data.length ; i++){
-                        var d = data[i];
-                        if(d.IsComplete){
-                            $("#job").append(`
-                                <tr id="tr_${d.Unique}" onclick="document.location='/compare/{{ .Id1.Unique }}/${d.Unique}'">
-                                    <td>${d.Name}</td>
-                                    <td>${d.Request.Url}</td>
-                                    <td><span class="label label-success">finished</span></td>
-                                </tr>
-                            `);
-                        }
-                    }
-                }else{
-                    $("#job").append("<td></td><td></td><td></td>")
-                }
-            }
-        })
-    })
+
+var data = {{ .data }}
+if(data.length > 0){
+    for(var i = 0 ; i < data.length ; i++){
+        var d = data[i];
+        if(d.IsComplete){
+            $("#job").append(`
+                <tr id="tr_${d.Unique}" onclick="document.location='/compare/{{ .Id1.Unique }}/${d.Unique}'">
+                    <td>${d.Name}</td>
+                    <td>${d.Request.Url}</td>
+                    <td><span class="label label-success">finished</span></td>
+                </tr>
+            `);
+        }
+    }
+}else{
+    $("#job").append("<td></td><td></td><td></td>")
+}
 </script>
 </body>
 </html>
