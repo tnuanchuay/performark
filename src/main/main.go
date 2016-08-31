@@ -214,24 +214,15 @@ func main(){
 		}
 
 		s := CHART_SCRIPT
-		s = strings.Replace(s, "{{.Unique}}", unique, -1)
-		s = strings.Replace(s, "{{.rps}}", string(jsonrps), -1)
-		s = strings.Replace(s, "{{.tps}}", string(jsontps), -1)
-		s = strings.Replace(s, "{{.lm}}", string(jsonlm), -1)
-		s = strings.Replace(s, "{{.la}}", string(jsonla), -1)
-		s = strings.Replace(s, "{{.ls}}", string(jsonls), -1)
-		s = strings.Replace(s, "{{.tm}}", string(jsontm), -1)
-		s = strings.Replace(s, "{{.ta}}", string(jsonta), -1)
-		s = strings.Replace(s, "{{.ts}}", string(jsonts), -1)
-		s = strings.Replace(s, "{{.r}}", string(jsonr), -1)
-		s = strings.Replace(s, "{{.tt}}", string(jsontt), -1)
-		s = strings.Replace(s, "{{.ec}}", string(jsonec), -1)
-		s = strings.Replace(s, "{{.er}}", string(jsoner), -1)
-		s = strings.Replace(s, "{{.ew}}", string(jsonew), -1)
-		s = strings.Replace(s, "{{.et}}", string(jsonet), -1)
-		s = strings.Replace(s, "{{.e}}", string(jsone), -1)
-		s = strings.Replace(s, "{{.label}}", string(label), -1)
-		s = strings.Replace(s, "{{.rp2xx}}", string(rp2xx), -1)
+
+		templateName := []string{"{{.Unique}}", "{{.rps}}", "{{.tps}}", "{{.lm}}", "{{.la}}", "{{.ls}}",
+						"{{.tm}}", "{{.ta}}", "{{.ts}}", "{{.r}}", "{{.tt}}", "{{.ec}}",
+						"{{.er}}", "{{.ew}}", "{{.et}}", "{{.e}}", "{{.label}}", "{{.rp2xx}}"}
+		value := 	[][]byte{jsonrps, jsontps, jsonlm, jsonlm, jsonla, jsonls, jsontm, jsonta, jsonts,
+						jsonr, jsontt, jsonec, jsoner, jsonew, jsonet, jsone, label, rp2xx}
+		for i, tname := range templateName{
+			s = strings.Replace(s, tname, string(value[i]), -1)
+		}
 
 		ctx.Text(iris.StatusOK, s)
 	})
