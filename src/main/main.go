@@ -218,7 +218,7 @@ func main(){
 		templateName := []string{"{{.Unique}}", "{{.rps}}", "{{.tps}}", "{{.lm}}", "{{.la}}", "{{.ls}}",
 						"{{.tm}}", "{{.ta}}", "{{.ts}}", "{{.r}}", "{{.tt}}", "{{.ec}}",
 						"{{.er}}", "{{.ew}}", "{{.et}}", "{{.e}}", "{{.label}}", "{{.rp2xx}}"}
-		value := 	[][]byte{jsonrps, jsontps, jsonlm, jsonlm, jsonla, jsonls, jsontm, jsonta, jsonts,
+		value := 	[][]byte{[]byte(unique), jsonrps, jsontps, jsonlm, jsonla, jsonls, jsontm, jsonta, jsonts,
 						jsonr, jsontt, jsonec, jsoner, jsonew, jsonet, jsone, label, rp2xx}
 		for i, tname := range templateName{
 			s = strings.Replace(s, tname, string(value[i]), -1)
