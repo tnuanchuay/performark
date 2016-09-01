@@ -133,7 +133,7 @@ func (j *Job) Grading(session *mgo.Session){
 
 	var successRates []float64
 	var result []WrkResult
-	var throughput	[]float64
+	var testcaseThoughputs        []float64
 	result = WrkResult{}.FindByUnique(session, j.Unique)
 
 	//calc success rate
@@ -142,10 +142,22 @@ func (j *Job) Grading(session *mgo.Session){
 	}
 
 	for i, successRate := range successRates{
-		throughput = append(throughput, ((result[i].RequestPerSec * 45) + (successRate * 55))/100)
+		testcaseThoughputs = append(testcaseThoughputs, ((result[i].RequestPerSec * 45) + (successRate * 55))/100)
 	}
 
-	for i, tp := range throughput{
+	for i, tp := range testcaseThoughputs {
 		fmt.Println(result[i].Connection, tp)
 	}
+
+	var thoughputMultiplyWithConnection	float64
+	var sumConnection	float64
+	var systemThoughtput	float64
+
+	for i, tp := range testcaseThoughputs {
+		thoughputMultiplyWithConnection += (tp * float64(result[i].Connection))
+		sumConnection += float64(result[i].Connection)
+	}
+
+	systemThoughtput = thoughputMultiplyWithConnection / sumConnection
+	fmt.Println("SYSTEM THOUGHTPUT", systemThoughtput)
 }
