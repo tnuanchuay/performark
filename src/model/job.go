@@ -12,15 +12,16 @@ import (
 
 type (
 	Job struct{
-		Name		string
-		Unique		string
-		IsComplete	bool
-		Request		Request
-		Label		[]string
-		TestcaseName	string
-		Error		bool
-		Script		string
-		Grade		rune
+		Name             string
+		Unique           string
+		IsComplete       bool
+		Request          Request
+		Label            []string
+		TestcaseName     string
+		Error            bool
+		Script           string
+		Grade            string
+		SystemThroughput float64
 	}
 )
 
@@ -127,7 +128,7 @@ func (Job) FindNotLikeThis(session *mgo.Session, unique string) []Job{
 
 func (j *Job) Grading(session *mgo.Session){
 	if j.Error {
-		j.Grade = 'F'
+		j.Grade = "F"
 		return;
 	}
 
@@ -142,12 +143,12 @@ func (j *Job) Grading(session *mgo.Session){
 	}
 
 	for i, successRate := range successRates{
-		testcaseThoughputs = append(testcaseThoughputs, ((result[i].RequestPerSec * 45) + (successRate * 55))/100)
+		testcaseThoughputs = append(testcaseThoughputs, ((result[i].RequestPerSec * 30) + (successRate * 70))/100)
 	}
 
-	for i, tp := range testcaseThoughputs {
-		fmt.Println(result[i].Connection, tp)
-	}
+	//for i, tp := range testcaseThoughputs {
+	//	fmt.Println(result[i].Connection, tp)
+	//}
 
 	var thoughputMultiplyWithConnection	float64
 	var sumConnection	float64
@@ -159,5 +160,24 @@ func (j *Job) Grading(session *mgo.Session){
 	}
 
 	systemThoughtput = thoughputMultiplyWithConnection / sumConnection
+
 	fmt.Println("SYSTEM THOUGHTPUT", systemThoughtput)
+	j.SystemThroughput = systemThoughtput
+
+	switch  {
+	case systemThoughtput > 100000.0:
+		j.Grade = "A"
+	case systemThoughtput > 50000.0:
+		j.Grade = "B"
+	case systemThoughtput > 25000.0:
+		j.Grade = "C"
+	case systemThoughtput > 12500.0:
+		j.Grade = "D"
+	case systemThoughtput > 6250.0:
+		j.Grade = "E"
+	default:
+		j.Grade = "F"
+	}
+
+	fmt.Println("GRADE", string(j.Grade))
 }

@@ -104,6 +104,8 @@ func main(){
 			"Url":j.Request.Url,
 			"Load":j.Request.Load,
 			"TestCaseName":j.TestcaseName,
+			"Grade":j.Grade,
+			"SystemTP":fmt.Sprintf("%.2f", j.SystemThroughput),
 		})
 	})
 
@@ -118,9 +120,11 @@ func main(){
 		unique := ctx.Param("unique")
 		j := model.Job{}.Find(session, unique)
 
-		if j.Grade == 0{
+		if j.Grade == "" {
 			j.Grading(session)
+			j.Save(session)
 		}
+
 
 		chart := model.Chart{}.NewInstance(unique)
 
@@ -221,10 +225,10 @@ func main(){
 		s := CHART_SCRIPT
 
 		templateName := []string{"{{.Unique}}", "{{.rps}}", "{{.tps}}", "{{.lm}}", "{{.la}}", "{{.ls}}",
-						"{{.tm}}", "{{.ta}}", "{{.ts}}", "{{.r}}", "{{.tt}}", "{{.ec}}",
-						"{{.er}}", "{{.ew}}", "{{.et}}", "{{.e}}", "{{.label}}", "{{.rp2xx}}"}
+			"{{.tm}}", "{{.ta}}", "{{.ts}}", "{{.r}}", "{{.tt}}", "{{.ec}}",
+			"{{.er}}", "{{.ew}}", "{{.et}}", "{{.e}}", "{{.label}}", "{{.rp2xx}}"}
 		value := 	[][]byte{[]byte(unique), jsonrps, jsontps, jsonlm, jsonla, jsonls, jsontm, jsonta, jsonts,
-						jsonr, jsontt, jsonec, jsoner, jsonew, jsonet, jsone, label, rp2xx}
+			jsonr, jsontt, jsonec, jsoner, jsonew, jsonet, jsone, label, rp2xx}
 		for i, tname := range templateName{
 			s = strings.Replace(s, tname, string(value[i]), -1)
 		}
