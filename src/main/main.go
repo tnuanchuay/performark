@@ -479,6 +479,9 @@ func main(){
 							`{"Unique":"` + t + `", "IsComplete":false, "Progress":` + fmt.Sprintf("%.2f", float64((i+1))/float64(len(selectedTestSuite.Testcase))*100.0) + `}`)
 					}
 					j.Grading(session)
+					if j.Name == ""{
+						j.Name = j.Unique
+					}
 					j.Complete(session)
 					server.BroadcastTo("real-time", t, `{"Unique":"` + t + `", "IsComplete":true, "Progress":100}`)
 					wg.Done()
