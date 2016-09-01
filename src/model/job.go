@@ -125,11 +125,27 @@ func (Job) FindNotLikeThis(session *mgo.Session, unique string) []Job{
 	return result
 }
 
-func (j *Job) Grading(){
+func (j *Job) Grading(session *mgo.Session){
 	if j.Error {
 		j.Grade = 'F'
 		return;
 	}
 
+	var successRates []float64
+	var result []WrkResult
+	var throughput	[]float64
+	result = WrkResult{}.FindByUnique(session, j.Unique)
 
+	//calc success rate
+	for _, tResult := range result{
+		successRates = append(successRates, float64(tResult.Requests - tResult.Non2xx3xx)/tResult.Duration)
+	}
+
+	for i, successRate := range successRates{
+		throughput = append(throughput, ((result[i].RequestPerSec * 45) + (successRate * 55))/100)
+	}
+
+	for i, tp := range throughput{
+		fmt.Println(result[i].Connection, tp)
+	}
 }
