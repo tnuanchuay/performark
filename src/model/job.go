@@ -20,6 +20,7 @@ type (
 		TestcaseName	string
 		Error		bool
 		Script		string
+		Grade		rune
 	}
 )
 
@@ -122,4 +123,13 @@ func (Job) FindNotLikeThis(session *mgo.Session, unique string) []Job{
 	err := c.Find(bson.M{"unique":bson.M{"$ne":fmt.Sprintf("%s", unique)}}).All(&result)
 	fmt.Println(err)
 	return result
+}
+
+func (j *Job) Grading(){
+	if j.Error {
+		j.Grade = 'F'
+		return;
+	}
+
+
 }

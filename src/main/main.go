@@ -473,8 +473,9 @@ func main(){
 					server.BroadcastTo("real-time", t, `{"Unique":"` + t + `", "IsComplete":true, "Progress":100}`)
 					wg.Done()
 				}()
-				wg.Wait()
 
+
+				wg.Wait()
 			}
 		}
 	}()
