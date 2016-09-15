@@ -30,7 +30,7 @@
 * ```./performark```
 * Open browser and go http://127.0.0.1:8080
 
-### Get Starting
+### Getting Start
 * รันแอปพลิเคชันด้วย ```./performark```
 * เปิด browser http://127.0.0.1:8080
 * ที่ช่อง URL ใส่ url ที่ server ของท่านกำลังทำงานอยู่
